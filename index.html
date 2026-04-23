@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Canina — Do pelo ao instinto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="logo-badge">🐾 Powered by Orbetelli</div>
+    <h1>Do pelo<br>ao <em>instinto</em></h1>
+    <p>Explore raças, comportamentos, alimentação e habitats de cachorros e canídeos do mundo inteiro.</p>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="tags">
+    <span class="tag on" onclick="setTag(this, '')">Tudo</span>
+    <span class="tag" onclick="setTag(this, 'raças')">🐕 Raças</span>
+    <span class="tag" onclick="setTag(this, 'comportamento')">🧠 Comportamento</span>
+    <span class="tag" onclick="setTag(this, 'alimentação')">🍖 Alimentação</span>
+    <span class="tag" onclick="setTag(this, 'habitat')">🌿 Habitat</span>
+    <span class="tag" onclick="setTag(this, 'saúde')">❤️ Saúde</span>
+  </div>
+
+  <!-- BUSCA -->
+  <div class="search-wrap">
+    <input
+      type="text"
+      id="q"
+      placeholder="Pergunte qualquer coisa sobre cachorros..."
+      onkeydown="if(event.key==='Enter') ask()"
+    />
+    <button class="search-btn" onclick="ask()" title="Perguntar">↑</button>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div id="historico-wrap" style="display:none; margin-bottom: 1.25rem;">
+    <div class="section-label" style="margin-bottom: 8px;">🕐 Perguntas recentes</div>
+    <div id="historico-lista" class="historico-lista"></div>
+  </div>
+
+  <!-- SUGESTÕES RÁPIDAS -->
+  <div class="quick">
+    <span class="qpill" onclick="go('Quais raças de cachorro são boas para apartamento?')">Raças p/ apartamento</span>
+    <span class="qpill" onclick="go('Por que cachorros farejam tanto?')">Por que farejam tanto?</span>
+    <span class="qpill" onclick="go('Qual a origem do Shiba Inu?')">Origem do Shiba Inu</span>
+    <span class="qpill" onclick="go('O que lobos comem na natureza?')">Dieta do lobo</span>
+    <span class="qpill" onclick="go('Cachorros sonham de verdade?')">Cachorros sonham?</span>
+  </div>
+
+  <!-- RESPOSTA DA IA -->
+  <div class="answer-card" id="card">
+    <div class="placeholder">Faça uma pergunta acima ou escolha uma raça abaixo para começar sua exploração. 🐶</div>
+  </div>
+
+  <!-- RAÇAS -->
+  <div class="breeds-header">
+    <span class="section-label">Explorar raças</span>
+    <div class="breeds-arrows">
+      <button class="arrow-btn" id="arrow-left" onclick="scrollBreeds(-1)" title="Anterior">&#8592;</button>
+      <button class="arrow-btn" id="arrow-right" onclick="scrollBreeds(1)" title="Próximo">&#8594;</button>
+    </div>
+  </div>
+  <div class="breeds-strip" id="breeds-strip">
+    <div class="breed-card" onclick="go('Características e origem do Golden Retriever')">
+      <div class="breed-icon">🦮</div><div class="breed-name">Golden Retriever</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Husky Siberiano')">
+      <div class="breed-icon">🐺</div><div class="breed-name">Husky Siberiano</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Bulldog Francês')">
+      <div class="breed-icon">🐾</div><div class="breed-name">Bulldog Francês</div>
+    </div>
+    <div class="breed-card" onclick="go('Como é o Shiba Inu?')">
+      <div class="breed-icon">🦊</div><div class="breed-name">Shiba Inu</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Border Collie')">
+      <div class="breed-icon">🐕</div><div class="breed-name">Border Collie</div>
+    </div>
+    <div class="breed-card" onclick="go('Como é o Dachshund salsicha?')">
+      <div class="breed-icon">🌭</div><div class="breed-name">Dachshund</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Poodle')">
+      <div class="breed-icon">🐩</div><div class="breed-name">Poodle</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Akita Inu japonês')">
+      <div class="breed-icon">🏯</div><div class="breed-name">Akita Inu</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Lobo Guará brasileiro')">
+      <div class="breed-icon">🌾</div><div class="breed-name">Lobo Guará</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Labrador Retriever')">
+      <div class="breed-icon">🐶</div><div class="breed-name">Labrador</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Beagle')">
+      <div class="breed-icon">🐕</div><div class="breed-name">Beagle</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Rottweiler')">
+      <div class="breed-icon">🦴</div><div class="breed-name">Rottweiler</div>
+    </div>
+    <div class="breed-card" onclick="go('Características do Samoyed')">
+      <div class="breed-icon">🤍</div><div class="breed-name">Samoyed</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">400+</div>
+      <div class="stat-lbl">raças reconhecidas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">15 mil</div>
+      <div class="stat-lbl">anos de domesticação</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">36</div>
+      <div class="stat-lbl">espécies de canídeos</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">IA Canina &bull; feita por Orbetelli/Claude AI</div>
+
+</div><!-- /container -->
+
+<script src="app.js"></script>
+</body>
+</html>
