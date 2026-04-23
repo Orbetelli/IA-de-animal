@@ -1,51 +1,44 @@
-# 🐾 IA Canina — Do pelo ao instinto
+# 🐾 BicharIA — Sua IA do mundo animal
 
-Uma inteligência artificial especialista em cães e canídeos selvagens, com interface elegante e respostas geradas pelo modelo **LLaMA 3.3 70B** via **Groq API**.
+Uma inteligência artificial especialista em animais domésticos e selvagens, com interface elegante e respostas geradas pelo modelo **LLaMA 3.3 70B** via Groq API.
 
-![Status](https://img.shields.io/badge/status-online-brightgreen)
-![Vercel](https://img.shields.io/badge/deploy-Vercel-black)
-![License](https://img.shields.io/badge/license-MIT-blue)
+🔗 **Acesse:** https://ia-de-animal.vercel.app/
 
 ---
 
 ## ✨ Funcionalidades
 
-- 🤖 **IA especialista** em raças, comportamento, alimentação, habitat e saúde canina
-- 🐕 **Explorador de raças** com atalhos rápidos para 13+ raças
-- 📸 **Fotos automáticas** das raças via Dog CEO API
+- 🤖 **IA especialista** em raças, comportamento, alimentação, habitat e saúde animal
+- 🐕 **Carrossel de cães** com 13 raças — fotos dinâmicas por raça
+- 🐇 **Carrossel de coelhos** com 9 raças — fotos dinâmicas por raça
+- 🐆 **Seção de lebres** — Lebre Europeia e Lebre Belga
 - 🏷️ **Filtros por tema** — Raças, Comportamento, Alimentação, Habitat, Saúde
 - 🕐 **Histórico de perguntas** salvo localmente no navegador
 - 📋 **Copiar resposta** com um clique
-- 🔒 **Backend seguro** — a chave da API nunca fica exposta no frontend
+- 🔒 **Backend seguro** — as chaves das APIs nunca ficam expostas no frontend
 
 ---
 
-## 🚀 Deploy
-
-O projeto está hospedado na **Vercel** com Serverless Functions para proteger as chaves de API.
-
-🔗 **Acesse:** [ia-de-animal.vercel.app](https://ia-de-animal.vercel.app)
-
----
-
-## 🛠️ Tecnologias
+## 🛠️ Tecnologias e integrações
 
 | Tecnologia | Uso |
 |---|---|
 | HTML + CSS + JS | Frontend puro |
-| [Groq API](https://console.groq.com) | IA (LLaMA 3.3 70B) |
-| [Dog CEO API](https://dog.ceo/dog-api/) | Fotos das raças |
-| Vercel Serverless Functions | Backend seguro |
-| GitHub | Versionamento |
+| Groq API — LLaMA 3.3 70B | Motor de IA para respostas |
+| Dog CEO API | Fotos dinâmicas de cães por raça |
+| Unsplash API | Fotos dinâmicas de coelhos e lebres |
+| Vercel Serverless Functions | Backend seguro para as APIs |
+| GitHub | Versionamento do código |
 
 ---
 
 ## 📁 Estrutura do projeto
 
 ```
-IA AUAU/
+BicharIA/
 ├── api/
-│   └── chat.js        # Serverless Function — chama a Groq com segurança
+│   ├── chat.js        # Serverless Function — integração com Groq
+│   └── photo.js       # Serverless Function — integração com Unsplash
 ├── index.html         # Interface principal
 ├── style.css          # Estilos
 ├── app.js             # Lógica do frontend
@@ -56,49 +49,16 @@ IA AUAU/
 
 ---
 
-## ⚙️ Como rodar localmente
+## 🐾 Animais disponíveis
 
-### Pré-requisitos
-- Conta na [Groq](https://console.groq.com) para obter uma API key gratuita
+**Cães:** Golden Retriever, Husky Siberiano, Bulldog Francês, Shiba Inu, Border Collie, Dachshund, Poodle, Akita Inu, Lobo Guará, Labrador, Beagle, Rottweiler, Samoyed
 
-### Passo a passo
+**Coelhos:** Holland Lop, Rex, Angorá, Mini Rex, Lionhead, New Zealand, Flemish Giant, Dutch, Californian
 
-**1. Clone o repositório:**
-```bash
-git clone https://github.com/Orbetelli/IA-de-animal.git
-cd IA-de-animal
-```
-
-**2. Crie o arquivo `.env` na raiz:**
-```
-GROQ_API_KEY=sua_chave_aqui
-```
-
-**3. Instale a Vercel CLI e rode localmente:**
-```bash
-npm install -g vercel
-vercel dev
-```
-
-**4. Acesse no navegador:**
-```
-http://localhost:3000
-```
-
----
-
-## 🔐 Variáveis de ambiente
-
-| Variável | Descrição |
-|---|---|
-| `GROQ_API_KEY` | Chave da API Groq — obtenha em [console.groq.com](https://console.groq.com) |
-
-> ⚠️ Nunca commite sua chave no GitHub. O arquivo `.env` já está no `.gitignore`.
+**Lebres:** Lebre Europeia, Lebre Belga
 
 ---
 
 ## 👤 Autor
 
 Feito com 🐾 por **Orbetelli** — com ajuda do Claude AI
-
----
