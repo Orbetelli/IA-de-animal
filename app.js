@@ -23,12 +23,20 @@ const BREED_MAP = {
   'lobo guará':         { type: 'dog', slug: null },
 
   // Coelhos
-  'holland lop':  { type: 'rabbit', query: 'holland lop rabbit' },
-  'rex':          { type: 'rabbit', query: 'rex rabbit' },
-  'angorá':       { type: 'rabbit', query: 'angora rabbit' },
-  'angora':       { type: 'rabbit', query: 'angora rabbit' },
-  'mini rex':     { type: 'rabbit', query: 'mini rex rabbit' },
-  'lionhead':     { type: 'rabbit', query: 'lionhead rabbit' },
+  'holland lop':    { type: 'rabbit', query: 'holland lop rabbit' },
+  'rex':            { type: 'rabbit', query: 'rex rabbit' },
+  'angorá':         { type: 'rabbit', query: 'angora rabbit' },
+  'angora':         { type: 'rabbit', query: 'angora rabbit' },
+  'mini rex':       { type: 'rabbit', query: 'mini rex rabbit' },
+  'lionhead':       { type: 'rabbit', query: 'lionhead rabbit' },
+  'new zealand':    { type: 'rabbit', query: 'new zealand rabbit' },
+  'flemish giant':  { type: 'rabbit', query: 'flemish giant rabbit' },
+  'dutch':          { type: 'rabbit', query: 'dutch rabbit' },
+  'californian':    { type: 'rabbit', query: 'californian rabbit' },
+
+  // Lebres
+  'lebre europeia': { type: 'rabbit', query: 'european hare' },
+  'lebre belga':    { type: 'rabbit', query: 'belgian hare' },
 };
 
 // ===== MENSAGENS DE LOADING DIVERTIDAS =====
@@ -125,11 +133,17 @@ async function fetchAnimalPhoto(pergunta) {
     if (match.type === 'rabbit') {
       // Usando imagens públicas do Wikimedia para coelhos (sem necessidade de API key)
       const imgs = {
-        'holland lop rabbit':  'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Oryctolagus_cuniculus_Rcdo.jpg/640px-Oryctolagus_cuniculus_Rcdo.jpg',
-        'rex rabbit':          'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Oryctolagus_cuniculus_Tasmania_2.jpg/640px-Oryctolagus_cuniculus_Tasmania_2.jpg',
-        'angora rabbit':       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Angora_rabbit_in_display.jpg/640px-Angora_rabbit_in_display.jpg',
-        'mini rex rabbit':     'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Oryctolagus_cuniculus_Rcdo.jpg/640px-Oryctolagus_cuniculus_Rcdo.jpg',
-        'lionhead rabbit':     'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Lionhead_rabbit_02.jpg/640px-Lionhead_rabbit_02.jpg',
+        'holland lop rabbit':   'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Oryctolagus_cuniculus_Rcdo.jpg/640px-Oryctolagus_cuniculus_Rcdo.jpg',
+        'rex rabbit':           'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Oryctolagus_cuniculus_Tasmania_2.jpg/640px-Oryctolagus_cuniculus_Tasmania_2.jpg',
+        'angora rabbit':        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Angora_rabbit_in_display.jpg/640px-Angora_rabbit_in_display.jpg',
+        'mini rex rabbit':      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Oryctolagus_cuniculus_Rcdo.jpg/640px-Oryctolagus_cuniculus_Rcdo.jpg',
+        'lionhead rabbit':      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Lionhead_rabbit_02.jpg/640px-Lionhead_rabbit_02.jpg',
+        'new zealand rabbit':   'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Oryctolagus_cuniculus_Tasmania_2.jpg/640px-Oryctolagus_cuniculus_Tasmania_2.jpg',
+        'flemish giant rabbit': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Flemish_Giant_Rabbit.jpg/640px-Flemish_Giant_Rabbit.jpg',
+        'dutch rabbit':         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Oryctolagus_cuniculus_Rcdo.jpg/640px-Oryctolagus_cuniculus_Rcdo.jpg',
+        'californian rabbit':   'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Oryctolagus_cuniculus_Tasmania_2.jpg/640px-Oryctolagus_cuniculus_Tasmania_2.jpg',
+        'european hare':        'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Lepus_europaeus_Pallas%2C_1778.jpg/640px-Lepus_europaeus_Pallas%2C_1778.jpg',
+        'belgian hare':         'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Belgian_Hare_002.jpg/640px-Belgian_Hare_002.jpg',
       };
       return imgs[match.query] || null;
     }

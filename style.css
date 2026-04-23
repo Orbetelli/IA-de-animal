@@ -94,6 +94,16 @@ body::before {
   animation: fadeDown .7s .2s ease both;
 }
 
+.hero-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: .04em;
+  margin-bottom: .5rem !important;
+  animation: fadeDown .7s .15s ease both;
+}
+
 /* ===== TAGS ===== */
 .tags {
   display: flex;
