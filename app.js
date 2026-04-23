@@ -193,18 +193,28 @@ async function ask() {
 
 // ===== SETAS DE NAVEGAÇÃO =====
 function scrollBreeds(direction) {
-  const strip = document.getElementById('breeds-strip');
-  strip.scrollBy({ left: direction * (96 + 10) * 3, behavior: 'smooth' });
-  setTimeout(updateArrows, 350);
+  scrollStrip('breeds-strip', direction);
 }
 
-function updateArrows() {
-  const strip = document.getElementById('breeds-strip');
+function scrollStrip(id, direction) {
+  const strip = document.getElementById(id);
+  if (!strip) return;
+  strip.scrollBy({ left: direction * (96 + 10) * 3, behavior: 'smooth' });
+  setTimeout(() => updateStripArrows(id), 350);
+}
+
+function updateStripArrows(id) {
+  const strip = document.getElementById(id);
+  if (!id === 'breeds-strip') return;
   const btnLeft  = document.getElementById('arrow-left');
   const btnRight = document.getElementById('arrow-right');
   if (!strip || !btnLeft || !btnRight) return;
   btnLeft.disabled  = strip.scrollLeft <= 0;
   btnRight.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
+}
+
+function updateArrows() {
+  updateStripArrows('breeds-strip');
 }
 
 // ===== INIT =====
