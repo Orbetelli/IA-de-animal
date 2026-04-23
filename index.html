@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IA Canina — Do pelo ao instinto</title>
+  <title>BicharIA — Sua IA do mundo animal</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -14,8 +14,8 @@
   <!-- HERO -->
   <div class="hero">
     <div class="logo-badge">🐾 Powered by Orbetelli</div>
-    <h1>Do pelo<br>ao <em>instinto</em></h1>
-    <p>Explore raças, comportamentos, alimentação e habitats de cachorros e canídeos do mundo inteiro.</p>
+    <h1>Sua IA do<br><em>mundo animal</em></h1>
+    <p>Explore raças, comportamentos, alimentação e curiosidades de cães, coelhos e muito mais.</p>
   </div>
 
   <!-- FILTROS -->
@@ -33,7 +33,7 @@
     <input
       type="text"
       id="q"
-      placeholder="Pergunte qualquer coisa sobre cachorros..."
+      placeholder="Pergunte qualquer coisa sobre animais..."
       onkeydown="if(event.key==='Enter') ask()"
     />
     <button class="search-btn" onclick="ask()" title="Perguntar">↑</button>
@@ -48,20 +48,21 @@
   <!-- SUGESTÕES RÁPIDAS -->
   <div class="quick">
     <span class="qpill" onclick="go('Quais raças de cachorro são boas para apartamento?')">Raças p/ apartamento</span>
-    <span class="qpill" onclick="go('Por que cachorros farejam tanto?')">Por que farejam tanto?</span>
+    <span class="qpill" onclick="go('Coelho Holland Lop é bom para iniciantes?')">Holland Lop p/ iniciantes?</span>
     <span class="qpill" onclick="go('Qual a origem do Shiba Inu?')">Origem do Shiba Inu</span>
-    <span class="qpill" onclick="go('O que lobos comem na natureza?')">Dieta do lobo</span>
+    <span class="qpill" onclick="go('O que coelhos Angorá comem?')">Dieta do Angorá</span>
     <span class="qpill" onclick="go('Cachorros sonham de verdade?')">Cachorros sonham?</span>
+    <span class="qpill" onclick="go('Coelho Lionhead tem cuidados especiais?')">Cuidados do Lionhead</span>
   </div>
 
   <!-- RESPOSTA DA IA -->
   <div class="answer-card" id="card">
-    <div class="placeholder">Faça uma pergunta acima ou escolha uma raça abaixo para começar sua exploração. 🐶</div>
+    <div class="placeholder">Faça uma pergunta acima ou escolha um animal abaixo para começar sua exploração. 🐾</div>
   </div>
 
-  <!-- RAÇAS -->
+  <!-- CÃES -->
   <div class="breeds-header">
-    <span class="section-label">Explorar raças</span>
+    <span class="section-label">🐕 Raças de cães</span>
     <div class="breeds-arrows">
       <button class="arrow-btn" id="arrow-left" onclick="scrollBreeds(-1)" title="Anterior">&#8592;</button>
       <button class="arrow-btn" id="arrow-right" onclick="scrollBreeds(1)" title="Próximo">&#8594;</button>
@@ -109,24 +110,46 @@
     </div>
   </div>
 
+  <!-- COELHOS -->
+  <div class="breeds-header" style="margin-top: 1rem;">
+    <span class="section-label">🐇 Raças de coelhos</span>
+  </div>
+  <div class="breeds-strip" id="rabbits-strip">
+    <div class="breed-card" onclick="go('Características e temperamento do coelho Holland Lop')">
+      <div class="breed-icon">🐇</div><div class="breed-name">Holland Lop</div>
+    </div>
+    <div class="breed-card" onclick="go('Como é o coelho Rex? Temperamento e cuidados')">
+      <div class="breed-icon">🐰</div><div class="breed-name">Rex</div>
+    </div>
+    <div class="breed-card" onclick="go('Coelho Angorá: características, pelos e cuidados')">
+      <div class="breed-icon">🤍</div><div class="breed-name">Angorá</div>
+    </div>
+    <div class="breed-card" onclick="go('Como é o coelho Mini Rex?')">
+      <div class="breed-icon">🐾</div><div class="breed-name">Mini Rex</div>
+    </div>
+    <div class="breed-card" onclick="go('Coelho Lionhead: origem e características')">
+      <div class="breed-icon">🦁</div><div class="breed-name">Lionhead</div>
+    </div>
+  </div>
+
   <!-- STATS -->
   <div class="stats">
     <div class="stat">
       <div class="stat-num">400+</div>
-      <div class="stat-lbl">raças reconhecidas</div>
+      <div class="stat-lbl">raças de cães</div>
     </div>
     <div class="stat">
-      <div class="stat-num">15 mil</div>
-      <div class="stat-lbl">anos de domesticação</div>
+      <div class="stat-num">50+</div>
+      <div class="stat-lbl">raças de coelhos</div>
     </div>
     <div class="stat">
-      <div class="stat-num">36</div>
-      <div class="stat-lbl">espécies de canídeos</div>
+      <div class="stat-num">8,7 mi</div>
+      <div class="stat-lbl">espécies animais</div>
     </div>
   </div>
 
   <!-- FOOTER -->
-  <div class="footer">IA Canina &bull; feita por Orbetelli/Claude AI</div>
+  <div class="footer">BicharIA &bull; feita por Orbetelli/Claude AI</div>
 
 </div><!-- /container -->
 

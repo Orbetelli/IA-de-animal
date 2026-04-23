@@ -4,7 +4,6 @@
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 export default async function handler(req, res) {
-  // Aceita apenas POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' });
   }
@@ -16,14 +15,13 @@ export default async function handler(req, res) {
   }
 
   const extra = tema ? `Foque especialmente em ${tema}.` : '';
-  const systemPrompt = `Você é uma IA especialista em cães e canídeos selvagens (lobos, raposas, coiotes, dingos, lobo-guará, etc). Responda sempre em português brasileiro, de forma cativante, curiosa e didática. Use emojis com moderação para tornar a resposta amigável. Seja conciso mas rico em detalhes — no máximo 4 parágrafos curtos. ${extra}`;
+  const systemPrompt = `Você é a BicharIA, uma inteligência artificial especialista em animais domésticos e selvagens — com foco especial em cães, coelhos e canídeos selvagens (lobos, raposas, coiotes, dingos, lobo-guará, etc). Responda sempre em português brasileiro, de forma cativante, curiosa e didática. Use emojis com moderação para tornar a resposta amigável. Seja conciso mas rico em detalhes — no máximo 4 parágrafos curtos. ${extra}`;
 
   try {
     const groqRes = await fetch(GROQ_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 🔑 A chave fica segura aqui no servidor, nunca exposta no frontend
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
       },
       body: JSON.stringify({

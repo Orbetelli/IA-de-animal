@@ -1,42 +1,53 @@
-// ===== MAPA DE RAÇAS (nome exibido → slug da Dog CEO API) =====
+// ===== MAPA DE ANIMAIS (nome exibido → slug da API de fotos) =====
+// Cães: Dog CEO API | Coelhos: Unsplash
 const BREED_MAP = {
-  'golden retriever':   'retriever/golden',
-  'husky siberiano':    'husky',
-  'bulldog francês':    'bulldog/french',
-  'shiba inu':          'shiba',
-  'border collie':      'collie/border',
-  'dachshund':          'dachshund',
-  'poodle':             'poodle',
-  'akita inu':          'akita',
-  'labrador':           'labrador',
-  'beagle':             'beagle',
-  'boxer':              'boxer',
-  'chihuahua':          'chihuahua',
-  'dalmatian':          'dalmatian',
-  'doberman':           'doberman',
-  'rottweiler':         'rottweiler',
-  'maltese':            'maltese',
-  'pug':                'pug',
-  'samoyed':            'samoyed',
-  'lobo guará':         null,
+  // Cães
+  'golden retriever':   { type: 'dog', slug: 'retriever/golden' },
+  'husky siberiano':    { type: 'dog', slug: 'husky' },
+  'bulldog francês':    { type: 'dog', slug: 'bulldog/french' },
+  'shiba inu':          { type: 'dog', slug: 'shiba' },
+  'border collie':      { type: 'dog', slug: 'collie/border' },
+  'dachshund':          { type: 'dog', slug: 'dachshund' },
+  'poodle':             { type: 'dog', slug: 'poodle' },
+  'akita inu':          { type: 'dog', slug: 'akita' },
+  'labrador':           { type: 'dog', slug: 'labrador' },
+  'beagle':             { type: 'dog', slug: 'beagle' },
+  'boxer':              { type: 'dog', slug: 'boxer' },
+  'chihuahua':          { type: 'dog', slug: 'chihuahua' },
+  'dalmatian':          { type: 'dog', slug: 'dalmatian' },
+  'doberman':           { type: 'dog', slug: 'doberman' },
+  'rottweiler':         { type: 'dog', slug: 'rottweiler' },
+  'maltese':            { type: 'dog', slug: 'maltese' },
+  'pug':                { type: 'dog', slug: 'pug' },
+  'samoyed':            { type: 'dog', slug: 'samoyed' },
+  'lobo guará':         { type: 'dog', slug: null },
+
+  // Coelhos
+  'holland lop':  { type: 'rabbit', query: 'holland lop rabbit' },
+  'rex':          { type: 'rabbit', query: 'rex rabbit' },
+  'angorá':       { type: 'rabbit', query: 'angora rabbit' },
+  'angora':       { type: 'rabbit', query: 'angora rabbit' },
+  'mini rex':     { type: 'rabbit', query: 'mini rex rabbit' },
+  'lionhead':     { type: 'rabbit', query: 'lionhead rabbit' },
 };
 
 // ===== MENSAGENS DE LOADING DIVERTIDAS =====
 const LOADING_MSGS = [
   'Farejando a resposta...',
-  'Consultando o especialista canino...',
+  'Consultando o especialista animal...',
   'Latindo para o servidor...',
   'Buscando no arquivo de patinhas...',
-  'Perguntando pro cachorro mais sábio...',
+  'Perguntando pro bicho mais sábio...',
   'Desenterrando uma curiosidade...',
   'Correndo atrás da informação...',
   'Aguardando o especialista parar de latir...',
-  'Checando o manual de raças...',
+  'Checando o manual das espécies...',
+  'Farejando pelos e pelagens...',
 ];
 
 // ===== STATE =====
 let tema = '';
-let historico = JSON.parse(localStorage.getItem('ia-canina-historico') || '[]');
+let historico = JSON.parse(localStorage.getItem('bicharIA-historico') || '[]');
 
 // ===== FILTRO DE TEMA =====
 function setTag(el, t) {
@@ -45,7 +56,7 @@ function setTag(el, t) {
   tema = t;
 }
 
-// ===== ATALHO DE RAÇA =====
+// ===== ATALHO DE ANIMAL =====
 function go(txt) {
   document.getElementById('q').value = txt;
   ask();
@@ -59,7 +70,7 @@ function randomLoadingMsg() {
 // ===== HISTÓRICO =====
 function salvarHistorico(pergunta) {
   historico = [pergunta, ...historico.filter(h => h !== pergunta)].slice(0, 6);
-  localStorage.setItem('ia-canina-historico', JSON.stringify(historico));
+  localStorage.setItem('bicharIA-historico', JSON.stringify(historico));
   renderHistorico();
 }
 
@@ -93,19 +104,38 @@ function copiarResposta() {
   });
 }
 
-// ===== BUSCA FOTO NA DOG CEO API =====
-async function fetchDogPhoto(pergunta) {
+// ===== BUSCA FOTO DO ANIMAL =====
+async function fetchAnimalPhoto(pergunta) {
   const lower = pergunta.toLowerCase();
-  let slug = null;
-  for (const [nome, breedSlug] of Object.entries(BREED_MAP)) {
-    if (lower.includes(nome)) { slug = breedSlug; break; }
+  let match = null;
+
+  for (const [nome, info] of Object.entries(BREED_MAP)) {
+    if (lower.includes(nome)) { match = info; break; }
   }
-  if (!slug) return null;
+
+  if (!match) return null;
+
   try {
-    const res = await fetch(`https://dog.ceo/api/breed/${slug}/images/random`);
-    const data = await res.json();
-    return data.status === 'success' ? data.message : null;
+    if (match.type === 'dog' && match.slug) {
+      const res = await fetch(`https://dog.ceo/api/breed/${match.slug}/images/random`);
+      const data = await res.json();
+      return data.status === 'success' ? data.message : null;
+    }
+
+    if (match.type === 'rabbit') {
+      // Usando imagens públicas do Wikimedia para coelhos (sem necessidade de API key)
+      const imgs = {
+        'holland lop rabbit':  'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Oryctolagus_cuniculus_Rcdo.jpg/640px-Oryctolagus_cuniculus_Rcdo.jpg',
+        'rex rabbit':          'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Oryctolagus_cuniculus_Tasmania_2.jpg/640px-Oryctolagus_cuniculus_Tasmania_2.jpg',
+        'angora rabbit':       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Angora_rabbit_in_display.jpg/640px-Angora_rabbit_in_display.jpg',
+        'mini rex rabbit':     'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Oryctolagus_cuniculus_Rcdo.jpg/640px-Oryctolagus_cuniculus_Rcdo.jpg',
+        'lionhead rabbit':     'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Lionhead_rabbit_02.jpg/640px-Lionhead_rabbit_02.jpg',
+      };
+      return imgs[match.query] || null;
+    }
   } catch { return null; }
+
+  return null;
 }
 
 // ===== CHAMADA AO BACKEND (/api/chat) =====
@@ -124,8 +154,7 @@ async function ask() {
   `;
 
   const [photoUrl, backendResponse] = await Promise.allSettled([
-    fetchDogPhoto(q),
-    // ✅ Agora chama o backend seguro, sem expor a chave no browser
+    fetchAnimalPhoto(q),
     fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -141,8 +170,8 @@ async function ask() {
     const foto = photoUrl.status === 'fulfilled' ? photoUrl.value : null;
 
     card.innerHTML = `
-      <div class="answer-label">🐾 IA Canina</div>
-      ${foto ? `<div class="dog-photo-wrap"><img src="${foto}" alt="Foto da raça" class="dog-photo" onerror="this.parentElement.style.display='none'"></div>` : ''}
+      <div class="answer-label">🐾 BicharIA</div>
+      ${foto ? `<div class="dog-photo-wrap"><img src="${foto}" alt="Foto do animal" class="dog-photo" onerror="this.parentElement.style.display='none'"></div>` : ''}
       <div class="answer-inner">${texto.replace(/\n/g, '<br>')}</div>
       <div class="answer-actions">
         <button class="action-btn" id="btn-copiar" onclick="copiarResposta()">📋 Copiar</button>
@@ -159,7 +188,7 @@ async function ask() {
   input.value = '';
 }
 
-// ===== SETAS DE NAVEGAÇÃO DAS RAÇAS =====
+// ===== SETAS DE NAVEGAÇÃO =====
 function scrollBreeds(direction) {
   const strip = document.getElementById('breeds-strip');
   strip.scrollBy({ left: direction * (96 + 10) * 3, behavior: 'smooth' });
