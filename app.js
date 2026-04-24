@@ -1,102 +1,100 @@
-// ===== MAPA DE ANIMAIS (nome exibido → slug da API de fotos) =====
-// Cães: Dog CEO API | Coelhos/Gatos: Unsplash
+// ===== MAPA DE ANIMAIS =====
 const BREED_MAP = {
-  // Cães
-  'golden retriever':   { type: 'dog', slug: 'retriever/golden' },
-  'husky siberiano':    { type: 'dog', slug: 'husky' },
-  'bulldog francês':    { type: 'dog', slug: 'bulldog/french' },
-  'shiba inu':          { type: 'dog', slug: 'shiba' },
-  'border collie':      { type: 'dog', slug: 'collie/border' },
-  'dachshund':          { type: 'dog', slug: 'dachshund' },
-  'poodle':             { type: 'dog', slug: 'poodle' },
-  'akita inu':          { type: 'dog', slug: 'akita' },
-  'labrador':           { type: 'dog', slug: 'labrador' },
-  'beagle':             { type: 'dog', slug: 'beagle' },
-  'boxer':              { type: 'dog', slug: 'boxer' },
-  'chihuahua':          { type: 'dog', slug: 'chihuahua' },
-  'dalmatian':          { type: 'dog', slug: 'dalmatian' },
-  'doberman':           { type: 'dog', slug: 'doberman' },
-  'rottweiler':         { type: 'dog', slug: 'rottweiler' },
-  'maltese':            { type: 'dog', slug: 'maltese' },
-  'pug':                { type: 'dog', slug: 'pug' },
-  'samoyed':            { type: 'dog', slug: 'samoyed' },
-  'lobo guará':         { type: 'dog', slug: null },
-
-  // ===== MAIS CÃES =====
-  'pastor alemão':       { type: 'dog', slug: 'germanshepherd' },
+  // ===== CÃES (Dog CEO API) =====
+  'golden retriever':      { type: 'dog', slug: 'retriever/golden' },
+  'husky siberiano':       { type: 'dog', slug: 'husky' },
+  'bulldog francês':       { type: 'dog', slug: 'bulldog/french' },
+  'shiba inu':             { type: 'dog', slug: 'shiba' },
+  'border collie':         { type: 'dog', slug: 'collie/border' },
+  'dachshund':             { type: 'dog', slug: 'dachshund' },
+  'poodle':                { type: 'dog', slug: 'poodle' },
+  'akita inu':             { type: 'dog', slug: 'akita' },
+  'labrador':              { type: 'dog', slug: 'labrador' },
+  'beagle':                { type: 'dog', slug: 'beagle' },
+  'boxer':                 { type: 'dog', slug: 'boxer' },
+  'chihuahua':             { type: 'dog', slug: 'chihuahua' },
+  'dalmatian':             { type: 'dog', slug: 'dalmatian' },
+  'dálmata':               { type: 'dog', slug: 'dalmatian' },
+  'doberman':              { type: 'dog', slug: 'doberman' },
+  'rottweiler':            { type: 'dog', slug: 'rottweiler' },
+  'maltese':               { type: 'dog', slug: 'maltese' },
+  'pug':                   { type: 'dog', slug: 'pug' },
+  'samoyed':               { type: 'dog', slug: 'samoyed' },
+  'lobo guará':            { type: 'dog', slug: null },
+  'pastor alemão':         { type: 'dog', slug: 'germanshepherd' },
+  'malinois':              { type: 'dog', slug: 'malinois' },
   'pastor belga malinois': { type: 'dog', slug: 'malinois' },
-  'pitbull':             { type: 'dog', slug: 'pitbull' },
-  'american pit bull terrier': { type: 'dog', slug: 'pitbull' },
-  'staffordshire bull terrier': { type: 'dog', slug: 'terrier/staffordshire' },
-  'buldogue inglês':     { type: 'dog', slug: 'bulldog/english' },
-  'yorkshire':           { type: 'dog', slug: 'terrier/yorkshire' },
-  'yorkshire terrier':   { type: 'dog', slug: 'terrier/yorkshire' },
-  'spitz alemão':        { type: 'dog', slug: 'pomeranian' },
-  'pomeranian':          { type: 'dog', slug: 'pomeranian' },
-  'chow chow':           { type: 'dog', slug: 'chow' },
-  'cocker spaniel':      { type: 'dog', slug: 'spaniel/cocker' },
-  'whippet':             { type: 'dog', slug: 'whippet' },
-  'greyhound':           { type: 'dog', slug: 'greyhound' },
-  'weimaraner':          { type: 'dog', slug: 'weimaraner' },
-  'basset hound':        { type: 'dog', slug: 'hound/basset' },
-  'shihtzu':             { type: 'dog', slug: 'shihtzu' },
-  'shih tzu':            { type: 'dog', slug: 'shihtzu' },
-  'pinscher':            { type: 'dog', slug: 'pinscher/miniature' },
-  'pinscher miniatura':  { type: 'dog', slug: 'pinscher/miniature' },
-  'pequinês':            { type: 'dog', slug: 'pekinese' },
-  'pekingese':           { type: 'dog', slug: 'pekinese' },
-  'schnauzer':           { type: 'dog', slug: 'schnauzer/miniature' },
-  'schnauzer miniatura': { type: 'dog', slug: 'schnauzer/miniature' },
-  'schnauzer gigante':   { type: 'dog', slug: 'schnauzer/giant' },
-  'poodle toy':          { type: 'dog', slug: 'poodle/toy' },
-  'poodle miniatura':    { type: 'dog', slug: 'poodle/miniature' },
+  'pitbull':               { type: 'dog', slug: 'pitbull' },
+  'buldogue inglês':       { type: 'dog', slug: 'bulldog/english' },
+  'yorkshire':             { type: 'dog', slug: 'terrier/yorkshire' },
+  'yorkshire terrier':     { type: 'dog', slug: 'terrier/yorkshire' },
+  'spitz alemão':          { type: 'dog', slug: 'pomeranian' },
+  'pomeranian':            { type: 'dog', slug: 'pomeranian' },
+  'chow chow':             { type: 'dog', slug: 'chow' },
+  'cocker spaniel':        { type: 'dog', slug: 'spaniel/cocker' },
+  'whippet':               { type: 'dog', slug: 'whippet' },
+  'greyhound':             { type: 'dog', slug: 'greyhound' },
+  'weimaraner':            { type: 'dog', slug: 'weimaraner' },
+  'basset hound':          { type: 'dog', slug: 'hound/basset' },
+  'shih tzu':              { type: 'dog', slug: 'shihtzu' },
+  'shihtzu':               { type: 'dog', slug: 'shihtzu' },
+  'pinscher':              { type: 'dog', slug: 'pinscher/miniature' },
+  'pinscher miniatura':    { type: 'dog', slug: 'pinscher/miniature' },
+  'pequinês':              { type: 'dog', slug: 'pekinese' },
+  'schnauzer':             { type: 'dog', slug: 'schnauzer/miniature' },
+  'corgi':                 { type: 'dog', slug: 'corgi/cardigan' },
+  'corgi galês':           { type: 'dog', slug: 'corgi/cardigan' },
+  'são bernardo':          { type: 'dog', slug: 'stbernard' },
 
-  // Coelhos
-  'holland lop':    { type: 'rabbit', query: 'holland lop rabbit' },
-  'rex':            { type: 'rabbit', query: 'rex rabbit' },
-  'angorá':         { type: 'rabbit', query: 'angora rabbit' },
-  'angora':         { type: 'rabbit', query: 'angora rabbit' },
-  'mini rex':       { type: 'rabbit', query: 'mini rex rabbit' },
-  'lionhead':       { type: 'rabbit', query: 'lionhead rabbit' },
-  'new zealand':    { type: 'rabbit', query: 'new zealand rabbit' },
-  'flemish giant':  { type: 'rabbit', query: 'flemish giant rabbit' },
-  'dutch':          { type: 'rabbit', query: 'dutch rabbit' },
-  'californian':    { type: 'rabbit', query: 'californian rabbit' }, 
-  'satin':          { type: 'rabbit', query: 'satin rabbit' },
-
-  // Lebres
-  'lebre europeia': { type: 'rabbit', query: 'european hare' },
-  'lebre belga':    { type: 'rabbit', query: 'belgian hare' },
-  'pronolagus':     { type: 'rabbit', query: 'pronolagus' },
-
-  // ===== GATOS (via Unsplash backend) =====
-  'gato persa':          { type: 'cat', query: 'persian cat' },
+  // ===== GATOS (Unsplash) =====
   'persa':               { type: 'cat', query: 'persian cat' },
+  'gato persa':          { type: 'cat', query: 'persian cat' },
   'maine coon':          { type: 'cat', query: 'maine coon cat' },
   'siamês':              { type: 'cat', query: 'siamese cat' },
-  'siames':              { type: 'cat', query: 'siamese cat' },
   'ragdoll':             { type: 'cat', query: 'ragdoll cat' },
   'sphynx':              { type: 'cat', query: 'sphynx cat' },
   'bengal':              { type: 'cat', query: 'bengal cat' },
   'british shorthair':   { type: 'cat', query: 'british shorthair cat' },
   'scottish fold':       { type: 'cat', query: 'scottish fold cat' },
   'angorá turco':        { type: 'cat', query: 'turkish angora cat' },
-  'turkish angora':      { type: 'cat', query: 'turkish angora cat' },
-  'american shorthair':  { type: 'cat', query: 'american shorthair cat' },
-  'exotic shorthair':    { type: 'cat', query: 'exotic shorthair cat' },
   'norwegian forest':    { type: 'cat', query: 'norwegian forest cat' },
   'gato norueguês':      { type: 'cat', query: 'norwegian forest cat' },
-  'bombay':              { type: 'cat', query: 'bombay cat' },
   'abissínio':           { type: 'cat', query: 'abyssinian cat' },
-  'abyssinian':          { type: 'cat', query: 'abyssinian cat' },
-  'burmese':             { type: 'cat', query: 'burmese cat' },
-  'birman':              { type: 'cat', query: 'birman cat' },
-  'manx':                { type: 'cat', query: 'manx cat' },
   'devon rex':           { type: 'cat', query: 'devon rex cat' },
   'cornish rex':         { type: 'cat', query: 'cornish rex cat' },
+  'bombay':              { type: 'cat', query: 'bombay cat' },
+  'birman':              { type: 'cat', query: 'birman cat' },
+  'exotic shorthair':    { type: 'cat', query: 'exotic shorthair cat' },
+  'american shorthair':  { type: 'cat', query: 'american shorthair cat' },
+  'burmese':             { type: 'cat', query: 'burmese cat' },
+  'manx':                { type: 'cat', query: 'manx cat' },
+
+  // ===== COELHOS (Unsplash) =====
+  'holland lop':   { type: 'rabbit', query: 'holland lop rabbit' },
+  'rex':           { type: 'rabbit', query: 'rex rabbit' },
+  'angorá':        { type: 'rabbit', query: 'angora rabbit' },
+  'angora':        { type: 'rabbit', query: 'angora rabbit' },
+  'mini rex':      { type: 'rabbit', query: 'mini rex rabbit' },
+  'lionhead':      { type: 'rabbit', query: 'lionhead rabbit' },
+  'new zealand':   { type: 'rabbit', query: 'new zealand rabbit' },
+  'flemish giant': { type: 'rabbit', query: 'flemish giant rabbit' },
+  'dutch':         { type: 'rabbit', query: 'dutch rabbit' },
+  'californian':   { type: 'rabbit', query: 'californian rabbit' },
+  'satin':         { type: 'rabbit', query: 'satin rabbit' },
+  'mini lop':      { type: 'rabbit', query: 'mini lop rabbit' },
+
+  // ===== LEBRES (Unsplash) =====
+  'lebre europeia': { type: 'rabbit', query: 'european hare' },
+  'lebre belga':    { type: 'rabbit', query: 'belgian hare' },
+  'pronolagus':     { type: 'rabbit', query: 'pronolagus hare' },
+
+  // ===== CAPIVARAS (Unsplash) =====
+  'capivara':            { type: 'capybara', query: 'capybara nature' },
+  'capivara selvagem':   { type: 'capybara', query: 'capybara wild nature' },
+  'capivara doméstica':  { type: 'capybara', query: 'capybara pet' },
 };
 
-// ===== MENSAGENS DE LOADING DIVERTIDAS =====
+// ===== MENSAGENS DE LOADING =====
 const LOADING_MSGS = [
   'Farejando a resposta...',
   'Consultando o especialista animal...',
@@ -143,12 +141,7 @@ function renderHistorico() {
   const wrap = document.getElementById('historico-wrap');
   const lista = document.getElementById('historico-lista');
   if (!wrap || !lista) return;
-
-  if (historico.length === 0) {
-    wrap.style.display = 'none';
-    return;
-  }
-
+  if (historico.length === 0) { wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
   lista.innerHTML = historico.map(h => `
     <span class="hist-pill" onclick="go('${h.replace(/'/g, "\\'")}')">
@@ -173,11 +166,9 @@ function copiarResposta() {
 async function fetchAnimalPhoto(pergunta) {
   const lower = pergunta.toLowerCase();
   let match = null;
-
   for (const [nome, info] of Object.entries(BREED_MAP)) {
     if (lower.includes(nome)) { match = info; break; }
   }
-
   if (!match) return null;
 
   try {
@@ -186,16 +177,8 @@ async function fetchAnimalPhoto(pergunta) {
       const data = await res.json();
       return data.status === 'success' ? data.message : null;
     }
-
-    if (match.type === 'rabbit') {
-      // Busca foto dinâmica via backend (Unsplash API — key segura no servidor)
-      const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
-      const data = await res.json();
-      return data.url || null;
-    }
-
-    if (match.type === 'cat') {
-      // Busca foto dinâmica via backend (Unsplash API — key segura no servidor)
+    // Gatos, coelhos, lebres e capivaras → Unsplash via backend
+    if (['cat', 'rabbit', 'capybara'].includes(match.type)) {
       const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
       const data = await res.json();
       return data.url || null;
@@ -268,8 +251,8 @@ function scrollStrip(id, direction) {
 }
 
 function updateStripArrows(id) {
+  if (id !== 'breeds-strip') return;
   const strip = document.getElementById(id);
-  if (!id === 'breeds-strip') return;
   const btnLeft  = document.getElementById('arrow-left');
   const btnRight = document.getElementById('arrow-right');
   if (!strip || !btnLeft || !btnRight) return;
