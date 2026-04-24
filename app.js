@@ -1,5 +1,5 @@
 // ===== MAPA DE ANIMAIS (nome exibido → slug da API de fotos) =====
-// Cães: Dog CEO API | Coelhos: Unsplash
+// Cães: Dog CEO API | Coelhos/Gatos: Unsplash
 const BREED_MAP = {
   // Cães
   'golden retriever':   { type: 'dog', slug: 'retriever/golden' },
@@ -22,6 +22,35 @@ const BREED_MAP = {
   'samoyed':            { type: 'dog', slug: 'samoyed' },
   'lobo guará':         { type: 'dog', slug: null },
 
+  // ===== MAIS CÃES =====
+  'pastor alemão':       { type: 'dog', slug: 'germanshepherd' },
+  'pastor belga malinois': { type: 'dog', slug: 'malinois' },
+  'pitbull':             { type: 'dog', slug: 'pitbull' },
+  'american pit bull terrier': { type: 'dog', slug: 'pitbull' },
+  'staffordshire bull terrier': { type: 'dog', slug: 'terrier/staffordshire' },
+  'buldogue inglês':     { type: 'dog', slug: 'bulldog/english' },
+  'yorkshire':           { type: 'dog', slug: 'terrier/yorkshire' },
+  'yorkshire terrier':   { type: 'dog', slug: 'terrier/yorkshire' },
+  'spitz alemão':        { type: 'dog', slug: 'pomeranian' },
+  'pomeranian':          { type: 'dog', slug: 'pomeranian' },
+  'chow chow':           { type: 'dog', slug: 'chow' },
+  'cocker spaniel':      { type: 'dog', slug: 'spaniel/cocker' },
+  'whippet':             { type: 'dog', slug: 'whippet' },
+  'greyhound':           { type: 'dog', slug: 'greyhound' },
+  'weimaraner':          { type: 'dog', slug: 'weimaraner' },
+  'basset hound':        { type: 'dog', slug: 'hound/basset' },
+  'shihtzu':             { type: 'dog', slug: 'shihtzu' },
+  'shih tzu':            { type: 'dog', slug: 'shihtzu' },
+  'pinscher':            { type: 'dog', slug: 'pinscher/miniature' },
+  'pinscher miniatura':  { type: 'dog', slug: 'pinscher/miniature' },
+  'pequinês':            { type: 'dog', slug: 'pekinese' },
+  'pekingese':           { type: 'dog', slug: 'pekinese' },
+  'schnauzer':           { type: 'dog', slug: 'schnauzer/miniature' },
+  'schnauzer miniatura': { type: 'dog', slug: 'schnauzer/miniature' },
+  'schnauzer gigante':   { type: 'dog', slug: 'schnauzer/giant' },
+  'poodle toy':          { type: 'dog', slug: 'poodle/toy' },
+  'poodle miniatura':    { type: 'dog', slug: 'poodle/miniature' },
+
   // Coelhos
   'holland lop':    { type: 'rabbit', query: 'holland lop rabbit' },
   'rex':            { type: 'rabbit', query: 'rex rabbit' },
@@ -34,12 +63,37 @@ const BREED_MAP = {
   'dutch':          { type: 'rabbit', query: 'dutch rabbit' },
   'californian':    { type: 'rabbit', query: 'californian rabbit' }, 
   'satin':          { type: 'rabbit', query: 'satin rabbit' },
-  'mini lop':       { type: 'rabbit', query: 'mini lop rabbit' },
 
   // Lebres
   'lebre europeia': { type: 'rabbit', query: 'european hare' },
   'lebre belga':    { type: 'rabbit', query: 'belgian hare' },
-  'pronolagus':     { type: 'rabbit', query: 'pronolagus' }
+  'pronolagus':     { type: 'rabbit', query: 'pronolagus' },
+
+  // ===== GATOS (via Unsplash backend) =====
+  'gato persa':          { type: 'cat', query: 'persian cat' },
+  'persa':               { type: 'cat', query: 'persian cat' },
+  'maine coon':          { type: 'cat', query: 'maine coon cat' },
+  'siamês':              { type: 'cat', query: 'siamese cat' },
+  'siames':              { type: 'cat', query: 'siamese cat' },
+  'ragdoll':             { type: 'cat', query: 'ragdoll cat' },
+  'sphynx':              { type: 'cat', query: 'sphynx cat' },
+  'bengal':              { type: 'cat', query: 'bengal cat' },
+  'british shorthair':   { type: 'cat', query: 'british shorthair cat' },
+  'scottish fold':       { type: 'cat', query: 'scottish fold cat' },
+  'angorá turco':        { type: 'cat', query: 'turkish angora cat' },
+  'turkish angora':      { type: 'cat', query: 'turkish angora cat' },
+  'american shorthair':  { type: 'cat', query: 'american shorthair cat' },
+  'exotic shorthair':    { type: 'cat', query: 'exotic shorthair cat' },
+  'norwegian forest':    { type: 'cat', query: 'norwegian forest cat' },
+  'gato norueguês':      { type: 'cat', query: 'norwegian forest cat' },
+  'bombay':              { type: 'cat', query: 'bombay cat' },
+  'abissínio':           { type: 'cat', query: 'abyssinian cat' },
+  'abyssinian':          { type: 'cat', query: 'abyssinian cat' },
+  'burmese':             { type: 'cat', query: 'burmese cat' },
+  'birman':              { type: 'cat', query: 'birman cat' },
+  'manx':                { type: 'cat', query: 'manx cat' },
+  'devon rex':           { type: 'cat', query: 'devon rex cat' },
+  'cornish rex':         { type: 'cat', query: 'cornish rex cat' },
 };
 
 // ===== MENSAGENS DE LOADING DIVERTIDAS =====
@@ -134,6 +188,13 @@ async function fetchAnimalPhoto(pergunta) {
     }
 
     if (match.type === 'rabbit') {
+      // Busca foto dinâmica via backend (Unsplash API — key segura no servidor)
+      const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
+      const data = await res.json();
+      return data.url || null;
+    }
+
+    if (match.type === 'cat') {
       // Busca foto dinâmica via backend (Unsplash API — key segura no servidor)
       const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
       const data = await res.json();
