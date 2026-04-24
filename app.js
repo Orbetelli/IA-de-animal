@@ -32,11 +32,14 @@ const BREED_MAP = {
   'new zealand':    { type: 'rabbit', query: 'new zealand rabbit' },
   'flemish giant':  { type: 'rabbit', query: 'flemish giant rabbit' },
   'dutch':          { type: 'rabbit', query: 'dutch rabbit' },
-  'californian':    { type: 'rabbit', query: 'californian rabbit' },
+  'californian':    { type: 'rabbit', query: 'californian rabbit' }, 
+  'satin':          { type: 'rabbit', query: 'satin rabbit' },
+  'mini lop':       { type: 'rabbit', query: 'mini lop rabbit' },
 
   // Lebres
   'lebre europeia': { type: 'rabbit', query: 'european hare' },
   'lebre belga':    { type: 'rabbit', query: 'belgian hare' },
+  'pronolagus':     { type: 'rabbit', query: 'pronolagus' }
 };
 
 // ===== MENSAGENS DE LOADING DIVERTIDAS =====
