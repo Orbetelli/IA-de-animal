@@ -89,9 +89,9 @@ const BREED_MAP = {
   'pronolagus':     { type: 'rabbit', query: 'pronolagus hare' },
 
   // ===== CAPIVARAS (Unsplash) =====
-  'capivara':            { type: 'capybara', query: 'capybara nature' },
-  'capivara selvagem':   { type: 'capybara', query: 'capybara wild nature' },
-  'capivara doméstica':  { type: 'capybara', query: 'capybara pet' },
+  'capivara':           { type: 'capybara', query: 'capybara nature' },
+  'capivara selvagem':  { type: 'capybara', query: 'capybara wild nature' },
+  'capivara doméstica': { type: 'capybara', query: 'capybara pet' },
 };
 
 // ===== MENSAGENS DE LOADING =====
@@ -128,6 +128,15 @@ function go(txt) {
 // ===== MENSAGEM ALEATÓRIA DE LOADING =====
 function randomLoadingMsg() {
   return LOADING_MSGS[Math.floor(Math.random() * LOADING_MSGS.length)];
+}
+
+// ===== ACORDEÃO =====
+function toggleAccordion(id) {
+  const panel = document.getElementById('panel-' + id);
+  const arrow = document.getElementById('arrow-' + id);
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 // ===== HISTÓRICO =====
@@ -177,7 +186,6 @@ async function fetchAnimalPhoto(pergunta) {
       const data = await res.json();
       return data.status === 'success' ? data.message : null;
     }
-    // Gatos, coelhos, lebres e capivaras → Unsplash via backend
     if (['cat', 'rabbit', 'capybara'].includes(match.type)) {
       const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
       const data = await res.json();
@@ -238,35 +246,7 @@ async function ask() {
   input.value = '';
 }
 
-// ===== SETAS DE NAVEGAÇÃO =====
-function scrollBreeds(direction) {
-  scrollStrip('breeds-strip', direction);
-}
-
-function scrollStrip(id, direction) {
-  const strip = document.getElementById(id);
-  if (!strip) return;
-  strip.scrollBy({ left: direction * (96 + 10) * 3, behavior: 'smooth' });
-  setTimeout(() => updateStripArrows(id), 350);
-}
-
-function updateStripArrows(id) {
-  if (id !== 'breeds-strip') return;
-  const strip = document.getElementById(id);
-  const btnLeft  = document.getElementById('arrow-left');
-  const btnRight = document.getElementById('arrow-right');
-  if (!strip || !btnLeft || !btnRight) return;
-  btnLeft.disabled  = strip.scrollLeft <= 0;
-  btnRight.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
-}
-
-function updateArrows() {
-  updateStripArrows('breeds-strip');
-}
-
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
-  updateArrows();
-  document.getElementById('breeds-strip')?.addEventListener('scroll', updateArrows);
   renderHistorico();
 });
