@@ -46,7 +46,7 @@ const BREED_MAP = {
   'corgi galês':           { type: 'dog', slug: 'corgi/cardigan' },
   'são bernardo':          { type: 'dog', slug: 'stbernard' },
 
-  // ===== GATOS (Unsplash) =====
+  // ===== GATOS — expandido =====
   'persa':               { type: 'cat', query: 'persian cat' },
   'gato persa':          { type: 'cat', query: 'persian cat' },
   'maine coon':          { type: 'cat', query: 'maine coon cat' },
@@ -68,8 +68,9 @@ const BREED_MAP = {
   'american shorthair':  { type: 'cat', query: 'american shorthair cat' },
   'burmese':             { type: 'cat', query: 'burmese cat' },
   'manx':                { type: 'cat', query: 'manx cat' },
+  'ocicat':              { type: 'cat', query: 'ocicat cat' },
 
-  // ===== COELHOS (Unsplash) =====
+  // ===== COELHOS — expandido =====
   'holland lop':   { type: 'rabbit', query: 'holland lop rabbit' },
   'rex':           { type: 'rabbit', query: 'rex rabbit' },
   'angorá':        { type: 'rabbit', query: 'angora rabbit' },
@@ -82,16 +83,38 @@ const BREED_MAP = {
   'californian':   { type: 'rabbit', query: 'californian rabbit' },
   'satin':         { type: 'rabbit', query: 'satin rabbit' },
   'mini lop':      { type: 'rabbit', query: 'mini lop rabbit' },
+  'polish':        { type: 'rabbit', query: 'polish rabbit' },
+  'harlequin':     { type: 'rabbit', query: 'harlequin rabbit' },
+  'english spot':  { type: 'rabbit', query: 'english spot rabbit' },
 
-  // ===== LEBRES (Unsplash) =====
+  // ===== LEBRES =====
   'lebre europeia': { type: 'rabbit', query: 'european hare' },
   'lebre belga':    { type: 'rabbit', query: 'belgian hare' },
   'pronolagus':     { type: 'rabbit', query: 'pronolagus hare' },
 
-  // ===== CAPIVARAS (Unsplash) =====
+  // ===== CAPIVARAS =====
   'capivara':           { type: 'capybara', query: 'capybara nature' },
   'capivara selvagem':  { type: 'capybara', query: 'capybara wild nature' },
   'capivara doméstica': { type: 'capybara', query: 'capybara pet' },
+
+  // ===== HAMSTERS =====
+  'hamster sírio':    { type: 'other', query: 'syrian hamster' },
+  'sírio':            { type: 'other', query: 'syrian hamster' },
+  'hamster anão russo': { type: 'other', query: 'russian dwarf hamster' },
+  'anão russo':       { type: 'other', query: 'russian dwarf hamster' },
+  'roborovski':       { type: 'other', query: 'roborovski hamster' },
+  'hamster roborovski': { type: 'other', query: 'roborovski hamster' },
+
+  // ===== RÉPTEIS =====
+  'iguana':          { type: 'other', query: 'green iguana' },
+  'gecko leopardo':  { type: 'other', query: 'leopard gecko' },
+  'dragão barbudo':  { type: 'other', query: 'bearded dragon' },
+
+  // ===== AVES =====
+  'calopsita':    { type: 'other', query: 'cockatiel bird' },
+  'periquito':    { type: 'other', query: 'budgerigar parakeet' },
+  'arara azul':   { type: 'other', query: 'blue macaw bird' },
+  'arara':        { type: 'other', query: 'macaw bird' },
 };
 
 // ===== MENSAGENS DE LOADING =====
@@ -186,7 +209,7 @@ async function fetchAnimalPhoto(pergunta) {
       const data = await res.json();
       return data.status === 'success' ? data.message : null;
     }
-    if (['cat', 'rabbit', 'capybara'].includes(match.type)) {
+    if (['cat', 'rabbit', 'capybara', 'other'].includes(match.type)) {
       const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
       const data = await res.json();
       return data.url || null;
