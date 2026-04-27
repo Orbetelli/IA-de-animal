@@ -86,6 +86,8 @@ const BREED_MAP = {
   'polish':        { type: 'rabbit', query: 'polish rabbit' },
   'harlequin':     { type: 'rabbit', query: 'harlequin rabbit' },
   'english spot':  { type: 'rabbit', query: 'english spot rabbit' },
+  'fuzzy lop':     { type: 'rabbit', query: 'fuzzy lop rabbit' },
+  'dwarf hotot':   { type: 'rabbit', query: 'dwarf hotot rabbit' },
 
   // ===== LEBRES =====
   'lebre europeia': { type: 'rabbit', query: 'european hare' },
