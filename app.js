@@ -21,12 +21,13 @@ const BREED_MAP = {
   'bull terrier':{'type':'dog','slug':'bullterrier/english'},'jack russell':{'type':'dog','slug':'terrier/russell'},
   'lhasa apso':{'type':'dog','slug':'lhasa'},'vizsla':{'type':'dog','slug':'vizsla'},
   'scottish terrier':{'type':'dog','slug':'terrier/scottish'},'lobo guará':{'type':'dog','slug':null},
-  'persa':{'type':'cat','query':'persian cat'},'maine coon':{'type':'cat','query':'maine coon cat'},
-  'siamês':{'type':'cat','query':'siamese cat'},'ragdoll':{'type':'cat','query':'ragdoll cat'},
-  'sphynx':{'type':'cat','query':'sphynx cat'},'bengal':{'type':'cat','query':'bengal cat'},
-  'british shorthair':{'type':'cat','query':'british shorthair cat'},'scottish fold':{'type':'cat','query':'scottish fold cat'},
-  'abissínio':{'type':'cat','query':'abyssinian cat'},'devon rex':{'type':'cat','query':'devon rex cat'},
-  'maine coon':{'type':'cat','query':'maine coon cat'},'bombay':{'type':'cat','query':'bombay cat'},
+  'persa':{'type':'cat','query':'persian cat'},
+  // FIX #4: chave 'maine coon' duplicada removida — mantida apenas uma entrada
+  'maine coon':{'type':'cat','query':'maine coon cat'},'siamês':{'type':'cat','query':'siamese cat'},
+  'ragdoll':{'type':'cat','query':'ragdoll cat'},'sphynx':{'type':'cat','query':'sphynx cat'},
+  'bengal':{'type':'cat','query':'bengal cat'},'british shorthair':{'type':'cat','query':'british shorthair cat'},
+  'scottish fold':{'type':'cat','query':'scottish fold cat'},'abissínio':{'type':'cat','query':'abyssinian cat'},
+  'devon rex':{'type':'cat','query':'devon rex cat'},'bombay':{'type':'cat','query':'bombay cat'},
   'cavalo árabe':{'type':'other','query':'arabian horse'},'mustang':{'type':'other','query':'mustang wild horse'},
   'frísio':{'type':'other','query':'friesian horse black'},'appaloosa':{'type':'other','query':'appaloosa horse'},
   'lusitano':{'type':'other','query':'lusitano horse'},'clydesdale':{'type':'other','query':'clydesdale horse'},
@@ -65,9 +66,9 @@ let tema = '';
 let modoVet = false;
 let historico = JSON.parse(localStorage.getItem('bicharIA-historico') || '[]');
 let favoritos = JSON.parse(localStorage.getItem('bicharIA-favoritos') || '[]');
-let ultimoTexto = null;
-let ultimaFoto = null;
-let compSelecionados = [];
+
+// FIX #6: mapa de { pergunta -> { texto, foto } } para vínculo correto entre pergunta e resposta
+const respostasCache = new Map();
 
 // ===== ONBOARDING =====
 function fecharOnboarding() {
@@ -111,7 +112,7 @@ async function carregarCuriosidade() {
   try {
     const res = await fetch('/api/chat', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({pergunta:'Me conta uma curiosidade animal incrível e pouco conhecida. Máximo 3 frases. Comece direto.', tema:''})
+      body: JSON.stringify({pergunta:'Me conta uma curiosidade animal incrível e pouco conhecida. Máximo 3 frases. Comece direto.', tema:'', historico:[]})
     });
     const data = await res.json();
     const texto = data.texto || 'Os polvos têm três corações! 🐙';
@@ -175,20 +176,33 @@ function renderHistorico() {
   if (!wrap || !lista) return;
   if (historico.length === 0) { wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
-  lista.innerHTML = historico.map(h => `
-    <span class="hist-pill" onclick="go('${h.replace(/'/g,"\\'")}')">🕐 ${h.length>40?h.slice(0,40)+'…':h}</span>
-  `).join('');
+
+  // FIX #3: removida interpolação direta de string no onclick — usando data-attribute
+  lista.innerHTML = historico.map(h => {
+    const label = h.length > 40 ? h.slice(0, 40) + '…' : h;
+    return `<span class="hist-pill" data-pergunta="${h.replace(/"/g,'&quot;')}">🕐 ${label}</span>`;
+  }).join('');
+
+  lista.querySelectorAll('.hist-pill').forEach(pill => {
+    pill.addEventListener('click', () => go(pill.dataset.pergunta));
+  });
 }
 
 // ===== FAVORITOS =====
-function toggleFavorito(pergunta) {
-  const btn = document.getElementById('btn-fav');
+// FIX #6: recebe texto e foto como parâmetros em vez de depender de globais soltos
+function toggleFavorito(pergunta, btn) {
+  const cache = respostasCache.get(pergunta) || {};
   const idx = favoritos.findIndex(f => f.pergunta === pergunta);
   if (idx >= 0) {
     favoritos.splice(idx, 1);
     if (btn) btn.textContent = '🤍 Favoritar';
   } else {
-    favoritos.unshift({pergunta, texto:(ultimoTexto||'').slice(0,300), foto:ultimaFoto, data:new Date().toLocaleDateString('pt-BR')});
+    favoritos.unshift({
+      pergunta,
+      texto: (cache.texto || '').slice(0, 300),
+      foto: cache.foto || null,
+      data: new Date().toLocaleDateString('pt-BR')
+    });
     favoritos = favoritos.slice(0, 20);
     if (btn) btn.textContent = '❤️ Favoritado!';
   }
@@ -203,20 +217,32 @@ function abrirFavoritos() {
     lista.innerHTML = '<div style="color:var(--muted);font-size:14px;text-align:center;padding:2rem 0">Nenhum favorito ainda.<br>Clique em 🤍 Favoritar após uma resposta!</div>';
     return;
   }
-  lista.innerHTML = favoritos.map((f,i) => `
+
+  // FIX #3: onclick removido do HTML — usando data-attribute + addEventListener
+  lista.innerHTML = favoritos.map((f, i) => `
     <div class="fav-item">
-      ${f.foto?`<img src="${f.foto}" class="fav-foto" onerror="this.style.display='none'">` : ''}
+      ${f.foto ? `<img src="${f.foto}" class="fav-foto" onerror="this.style.display='none'">` : ''}
       <div class="fav-content">
-        <div class="fav-pergunta">${f.pergunta.length>60?f.pergunta.slice(0,60)+'…':f.pergunta}</div>
-        <div class="fav-texto">${f.texto.slice(0,100)}…</div>
+        <div class="fav-pergunta">${f.pergunta.length > 60 ? f.pergunta.slice(0, 60) + '…' : f.pergunta}</div>
+        <div class="fav-texto">${f.texto.slice(0, 100)}…</div>
         <div class="fav-actions">
           <span class="fav-data">${f.data}</span>
-          <button class="action-btn" onclick="go('${f.pergunta.replace(/'/g,"\\'")}');document.getElementById('modal-favoritos').style.display='none'">↗ Ver</button>
-          <button class="action-btn" onclick="removerFav(${i})">🗑️</button>
+          <button class="action-btn" data-action="ver" data-pergunta="${f.pergunta.replace(/"/g,'&quot;')}">↗ Ver</button>
+          <button class="action-btn" data-action="remover" data-index="${i}">🗑️</button>
         </div>
       </div>
     </div>
   `).join('');
+
+  lista.querySelectorAll('[data-action="ver"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      go(btn.dataset.pergunta);
+      document.getElementById('modal-favoritos').style.display = 'none';
+    });
+  });
+  lista.querySelectorAll('[data-action="remover"]').forEach(btn => {
+    btn.addEventListener('click', () => removerFav(Number(btn.dataset.index)));
+  });
 }
 
 function removerFav(i) {
@@ -232,6 +258,8 @@ function abrirComparador() {
   renderCompSelecao();
 }
 
+let compSelecionados = [];
+
 function renderCompSelecao() {
   const animais = ['Golden Retriever','Husky Siberiano','Bulldog Francês','Shiba Inu','Border Collie',
     'Poodle','Labrador','Beagle','Rottweiler','Pastor Alemão','Chihuahua','Pug','Yorkshire',
@@ -241,62 +269,79 @@ function renderCompSelecao() {
   document.getElementById('comparador-area').innerHTML = `
     <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Selecione 2 animais para comparar:</p>
     <div class="comp-grid">
-      ${animais.map(a=>`<button class="comp-pill" id="cpill-${a.toLowerCase().replace(/ /g,'-')}" onclick="selecionarComp('${a}')">${a}</button>`).join('')}
+      ${animais.map(a => `<button class="comp-pill" id="cpill-${a.toLowerCase().replace(/ /g,'-')}" data-animal="${a}">${a}</button>`).join('')}
     </div>
     <div id="comp-sel" class="comp-selecionados"></div>
-    <button class="tool-submit" id="btn-comparar" onclick="executarComp()" style="display:none;margin-top:1rem">⚡ Comparar agora</button>
+    <button class="tool-submit" id="btn-comparar" style="display:none;margin-top:1rem">⚡ Comparar agora</button>
   `;
+
+  // FIX #3: onclick removido do HTML — eventos via addEventListener
+  document.querySelectorAll('.comp-pill').forEach(pill => {
+    pill.addEventListener('click', () => selecionarComp(pill.dataset.animal));
+  });
+  document.getElementById('btn-comparar').addEventListener('click', executarComp);
 }
 
 function selecionarComp(nome) {
   const idx = compSelecionados.indexOf(nome);
-  const pill = document.getElementById('cpill-'+nome.toLowerCase().replace(/ /g,'-'));
-  if (idx >= 0) { compSelecionados.splice(idx,1); if(pill) pill.classList.remove('on'); }
+  const pill = document.getElementById('cpill-' + nome.toLowerCase().replace(/ /g, '-'));
+  if (idx >= 0) { compSelecionados.splice(idx, 1); if (pill) pill.classList.remove('on'); }
   else {
     if (compSelecionados.length >= 2) return;
-    compSelecionados.push(nome); if(pill) pill.classList.add('on');
+    compSelecionados.push(nome); if (pill) pill.classList.add('on');
   }
-  document.getElementById('comp-sel').innerHTML = compSelecionados.map(s=>`<span class="tag on">${s}</span>`).join(' <span>vs</span> ');
-  document.getElementById('btn-comparar').style.display = compSelecionados.length===2 ? 'block' : 'none';
+  document.getElementById('comp-sel').innerHTML = compSelecionados.map(s => `<span class="tag on">${s}</span>`).join(' <span>vs</span> ');
+  document.getElementById('btn-comparar').style.display = compSelecionados.length === 2 ? 'block' : 'none';
 }
 
 async function executarComp() {
-  const [a,b] = compSelecionados;
+  const [a, b] = compSelecionados;
   document.getElementById('comparador-area').innerHTML = `<div style="color:var(--muted);font-size:14px;padding:1rem 0">⚡ Comparando ${a} vs ${b}...</div>`;
   try {
-    const res = await fetch('/api/chat', {method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({pergunta:`Compare "${a}" e "${b}". Responda APENAS em JSON: {"animal1":"${a}","animal2":"${b}","categorias":[{"nome":"Porte","valor1":"ex","valor2":"ex"},{"nome":"Energia","valor1":"ex","valor2":"ex"},{"nome":"Temperamento","valor1":"ex","valor2":"ex"},{"nome":"Pelo","valor1":"ex","valor2":"ex"},{"nome":"Vida útil","valor1":"ex","valor2":"ex"},{"nome":"Ideal para","valor1":"ex","valor2":"ex"},{"nome":"Origem","valor1":"ex","valor2":"ex"}],"veredito":"frase resumo"}`,tema:''})
+    const res = await fetch('/api/chat', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        pergunta: `Compare "${a}" e "${b}". Responda APENAS em JSON: {"animal1":"${a}","animal2":"${b}","categorias":[{"nome":"Porte","valor1":"ex","valor2":"ex"},{"nome":"Energia","valor1":"ex","valor2":"ex"},{"nome":"Temperamento","valor1":"ex","valor2":"ex"},{"nome":"Pelo","valor1":"ex","valor2":"ex"},{"nome":"Vida útil","valor1":"ex","valor2":"ex"},{"nome":"Ideal para","valor1":"ex","valor2":"ex"},{"nome":"Origem","valor1":"ex","valor2":"ex"}],"veredito":"frase resumo"}`,
+        tema: '',
+        historico: []
+      })
     });
     const data = await res.json();
-    const comp = JSON.parse(data.texto.replace(/```json|```/g,'').trim());
+    const comp = JSON.parse(data.texto.replace(/```json|```/g, '').trim());
     document.getElementById('comparador-area').innerHTML = `
       <div class="comp-header"><span class="comp-nome">${comp.animal1}</span><span style="color:var(--muted);font-size:12px">VS</span><span class="comp-nome">${comp.animal2}</span></div>
-      <div class="comp-tabela">${comp.categorias.map(c=>`<div class="comp-row"><span class="comp-val">${c.valor1}</span><span class="comp-label">${c.nome}</span><span class="comp-val">${c.valor2}</span></div>`).join('')}</div>
+      <div class="comp-tabela">${comp.categorias.map(c => `<div class="comp-row"><span class="comp-val">${c.valor1}</span><span class="comp-label">${c.nome}</span><span class="comp-val">${c.valor2}</span></div>`).join('')}</div>
       <div class="comp-veredito">💡 ${comp.veredito}</div>
-      <button class="simple-btn-outline" onclick="renderCompSelecao()" style="margin-top:.75rem">↩ Nova comparação</button>
+      <button class="simple-btn-outline" id="btn-nova-comp" style="margin-top:.75rem">↩ Nova comparação</button>
     `;
-  } catch(e) {
+    document.getElementById('btn-nova-comp').addEventListener('click', renderCompSelecao);
+  } catch (e) {
     document.getElementById('comparador-area').innerHTML = '<div style="color:var(--accent2);font-size:14px">Erro ao comparar. Tente novamente.</div>';
   }
 }
 
 // ===== CALCULADORA =====
 async function calcularRacao() {
-  const especie = document.getElementById('calc-especie').value;
-  const raca    = document.getElementById('calc-raca').value.trim();
-  const peso    = document.getElementById('calc-peso').value.trim();
-  const idade   = document.getElementById('calc-idade').value.trim();
-  const castrado= document.getElementById('calc-castrado').value;
-  const res_div = document.getElementById('calc-resultado');
-  if (!peso || !idade) { res_div.textContent='Preencha peso e idade!'; res_div.classList.add('show'); return; }
-  res_div.innerHTML='🐾 Calculando...'; res_div.classList.add('show');
+  const especie  = document.getElementById('calc-especie').value;
+  const raca     = document.getElementById('calc-raca').value.trim();
+  const peso     = document.getElementById('calc-peso').value.trim();
+  const idade    = document.getElementById('calc-idade').value.trim();
+  const castrado = document.getElementById('calc-castrado').value;
+  const res_div  = document.getElementById('calc-resultado');
+  if (!peso || !idade) { res_div.textContent = 'Preencha peso e idade!'; res_div.classList.add('show'); return; }
+  res_div.innerHTML = '🐾 Calculando...'; res_div.classList.add('show');
   try {
-    const res = await fetch('/api/chat', {method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({pergunta:`Calcule ração diária para: espécie:${especie}, raça:${raca||'não informada'}, peso:${peso}kg, idade:${idade}, castrado:${castrado}. Responda em português com: quantidade diária em gramas, número de refeições, horários e 1 dica nutricional. Use tópicos com emojis.`,tema:'alimentação'})
+    const res = await fetch('/api/chat', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        pergunta: `Calcule ração diária para: espécie:${especie}, raça:${raca || 'não informada'}, peso:${peso}kg, idade:${idade}, castrado:${castrado}. Responda em português com: quantidade diária em gramas, número de refeições, horários e 1 dica nutricional. Use tópicos com emojis.`,
+        tema: 'alimentação',
+        historico: []
+      })
     });
     const data = await res.json();
-    res_div.innerHTML = data.texto.replace(/\n/g,'<br>');
-  } catch { res_div.textContent='Erro ao calcular. Tente novamente.'; }
+    res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
+  } catch { res_div.textContent = 'Erro ao calcular. Tente novamente.'; }
 }
 
 // ===== VACINAÇÃO =====
@@ -305,15 +350,20 @@ async function gerarGuiaVacina() {
   const local   = document.getElementById('vacina-local').value;
   const idade   = document.getElementById('vacina-idade').value.trim();
   const res_div = document.getElementById('vacina-resultado');
-  if (!idade) { res_div.textContent='Informe a idade do animal!'; res_div.classList.add('show'); return; }
-  res_div.innerHTML='💉 Gerando guia...'; res_div.classList.add('show');
+  if (!idade) { res_div.textContent = 'Informe a idade do animal!'; res_div.classList.add('show'); return; }
+  res_div.innerHTML = '💉 Gerando guia...'; res_div.classList.add('show');
   try {
-    const res = await fetch('/api/chat', {method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({pergunta:`Guia de vacinação para: ${especie}, ${idade}, ${local}. Liste vacinas obrigatórias e opcionais, quando tomar, reforços e alertas. Use emojis e formato de calendário. Recomende sempre consultar veterinário.`,tema:'saúde'})
+    const res = await fetch('/api/chat', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        pergunta: `Guia de vacinação para: ${especie}, ${idade}, ${local}. Liste vacinas obrigatórias e opcionais, quando tomar, reforços e alertas. Use emojis e formato de calendário. Recomende sempre consultar veterinário.`,
+        tema: 'saúde',
+        historico: []
+      })
     });
     const data = await res.json();
-    res_div.innerHTML = data.texto.replace(/\n/g,'<br>');
-  } catch { res_div.textContent='Erro ao gerar guia. Tente novamente.'; }
+    res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
+  } catch { res_div.textContent = 'Erro ao gerar guia. Tente novamente.'; }
 }
 
 // ===== CALENDÁRIO =====
@@ -322,21 +372,21 @@ function abrirCalendario() {
   const lista = document.getElementById('calendario-lista');
   modal.style.display = 'flex';
   const hoje = new Date();
-  const sorted = [...CALENDARIO].sort((a,b)=>{
-    const da=new Date(hoje.getFullYear(),a.mes-1,a.dia);
-    const db=new Date(hoje.getFullYear(),b.mes-1,b.dia);
-    if(da<hoje) da.setFullYear(hoje.getFullYear()+1);
-    if(db<hoje) db.setFullYear(hoje.getFullYear()+1);
-    return da-db;
+  const sorted = [...CALENDARIO].sort((a, b) => {
+    const da = new Date(hoje.getFullYear(), a.mes - 1, a.dia);
+    const db = new Date(hoje.getFullYear(), b.mes - 1, b.dia);
+    if (da < hoje) da.setFullYear(hoje.getFullYear() + 1);
+    if (db < hoje) db.setFullYear(hoje.getFullYear() + 1);
+    return da - db;
   });
-  const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  lista.innerHTML = sorted.map(e=>{
-    const d=new Date(hoje.getFullYear(),e.mes-1,e.dia);
-    const isHoje=d.getDate()===hoje.getDate()&&d.getMonth()===hoje.getMonth();
-    return `<div class="cal-item ${isHoje?'cal-item--hoje':''}">
-      <div class="cal-data"><span class="cal-dia">${String(e.dia).padStart(2,'0')}</span><span class="cal-mes">${meses[e.mes-1]}</span></div>
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  lista.innerHTML = sorted.map(e => {
+    const d = new Date(hoje.getFullYear(), e.mes - 1, e.dia);
+    const isHoje = d.getDate() === hoje.getDate() && d.getMonth() === hoje.getMonth();
+    return `<div class="cal-item ${isHoje ? 'cal-item--hoje' : ''}">
+      <div class="cal-data"><span class="cal-dia">${String(e.dia).padStart(2, '0')}</span><span class="cal-mes">${meses[e.mes - 1]}</span></div>
       <div class="cal-info"><span class="cal-emoji">${e.emoji}</span>
-        <div><div class="cal-nome">${e.nome}${isHoje?'<span class="cal-hoje-badge">Hoje!</span>':''}</div><div class="cal-desc">${e.desc}</div></div>
+        <div><div class="cal-nome">${e.nome}${isHoje ? '<span class="cal-hoje-badge">Hoje!</span>' : ''}</div><div class="cal-desc">${e.desc}</div></div>
       </div></div>`;
   }).join('');
 }
@@ -347,11 +397,12 @@ function copiarResposta() {
   if (!inner) return;
   navigator.clipboard.writeText(inner.innerText).then(() => {
     const btn = document.getElementById('btn-copiar');
-    if (btn) { btn.textContent='✅ Copiado!'; setTimeout(()=>{btn.textContent='📋 Copiar';},2000); }
+    if (btn) { btn.textContent = '✅ Copiado!'; setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000); }
   });
 }
 
 // ===== FOTO =====
+// FIX #5: adicionado console.warn para facilitar debug de falhas silenciosas
 async function fetchAnimalPhoto(pergunta) {
   const lower = pergunta.toLowerCase();
   let match = null;
@@ -360,31 +411,33 @@ async function fetchAnimalPhoto(pergunta) {
   }
   if (!match) return null;
   try {
-    if (match.type==='dog'&&match.slug) {
+    if (match.type === 'dog' && match.slug) {
       const res = await fetch(`https://dog.ceo/api/breed/${match.slug}/images/random`);
       const data = await res.json();
-      return data.status==='success' ? data.message : null;
+      return data.status === 'success' ? data.message : null;
     }
-    if (['cat','rabbit','capybara','other'].includes(match.type)) {
+    if (['cat', 'rabbit', 'capybara', 'other'].includes(match.type)) {
       const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
       const data = await res.json();
       return data.url || null;
     }
-  } catch { return null; }
+  } catch (err) {
+    console.warn('[fetchAnimalPhoto] falhou:', err.message);
+    return null;
+  }
   return null;
 }
 
-
 // ===== COMPARTILHAR =====
-function abrirShare() {
-  if (!ultimoTexto) return;
+function abrirShare(pergunta) {
+  const cache = respostasCache.get(pergunta) || {};
   const modal = document.getElementById('modal-share');
   const foto  = document.getElementById('share-foto');
   const texto = document.getElementById('share-texto');
-  if (!modal) return;
-  if (ultimaFoto) { foto.src = ultimaFoto; foto.style.display = 'block'; }
+  if (!modal || !cache.texto) return;
+  if (cache.foto) { foto.src = cache.foto; foto.style.display = 'block'; }
   else { foto.style.display = 'none'; }
-  texto.textContent = ultimoTexto.slice(0, 280) + (ultimoTexto.length > 280 ? '...' : '');
+  texto.textContent = cache.texto.slice(0, 280) + (cache.texto.length > 280 ? '...' : '');
   modal.style.display = 'flex';
 }
 
@@ -395,9 +448,7 @@ function fecharShare() {
 
 async function copiarShareText() {
   const texto = document.getElementById('share-texto').textContent;
-  await navigator.clipboard.writeText(texto + '
-
-🐾 bicharIA.vercel.app');
+  await navigator.clipboard.writeText(texto + '\n\n🐾 bicharIA.vercel.app');
   const btn = document.getElementById('btn-share-copiar');
   if (btn) { btn.textContent = '✅ Copiado!'; setTimeout(() => { btn.textContent = '📋 Copiar texto'; }, 2000); }
 }
@@ -416,30 +467,55 @@ async function ask() {
     ? 'Responda como veterinário especialista. Seja técnico, preciso e sempre recomende consulta presencial.'
     : (tema ? `Foque especialmente em ${tema}.` : '');
 
+  // FIX #2: historico enviado ao backend (array vazio por ora — extensível para histórico real)
   const [photoUrl, backendRes] = await Promise.allSettled([
     fetchAnimalPhoto(q),
-    fetch('/api/chat', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta:q,tema:temaFinal})})
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ pergunta: q, tema: temaFinal, historico: [] })
+    })
   ]);
 
   try {
+    // FIX #1: verificação explícita de Promise rejeitada antes de acessar .value
+    if (backendRes.status === 'rejected') {
+      throw new Error('Falha na conexão com o servidor. Tente novamente.');
+    }
+
     const data = await backendRes.value.json();
     if (data.error) throw new Error(data.error);
+
     const texto = data.texto || 'Não foi possível obter uma resposta.';
-    const foto = photoUrl.status==='fulfilled' ? photoUrl.value : null;
-    ultimoTexto = texto; ultimaFoto = foto;
-    const isFav = favoritos.some(f=>f.pergunta===q);
+    const foto  = photoUrl.status === 'fulfilled' ? photoUrl.value : null;
+
+    // FIX #6: armazena no cache indexado por pergunta em vez de variáveis globais soltas
+    respostasCache.set(q, { texto, foto });
+    // Limita o cache a 20 entradas para não vazar memória
+    if (respostasCache.size > 20) {
+      respostasCache.delete(respostasCache.keys().next().value);
+    }
+
+    const isFav = favoritos.some(f => f.pergunta === q);
+
+    // FIX #3: onclicks removidos do HTML — botões recebem eventos via addEventListener abaixo
     card.innerHTML = `
-      <div class="answer-label">🐾 BicharIA${modoVet?' <span style="font-size:10px;background:rgba(63,182,139,.2);color:#3FB68B;padding:2px 8px;border-radius:999px;border:1px solid rgba(63,182,139,.4)">🩺 Vet</span>':''}</div>
-      ${foto?`<div class="dog-photo-wrap"><img src="${foto}" alt="Foto" class="dog-photo" onerror="this.parentElement.style.display='none'"></div>`:''}
-      <div class="answer-inner">${texto.replace(/\n/g,'<br>')}</div>
+      <div class="answer-label">🐾 BicharIA${modoVet ? ' <span style="font-size:10px;background:rgba(63,182,139,.2);color:#3FB68B;padding:2px 8px;border-radius:999px;border:1px solid rgba(63,182,139,.4)">🩺 Vet</span>' : ''}</div>
+      ${foto ? `<div class="dog-photo-wrap"><img src="${foto}" alt="Foto" class="dog-photo" onerror="this.parentElement.style.display='none'"></div>` : ''}
+      <div class="answer-inner">${texto.replace(/\n/g, '<br>')}</div>
       <div class="answer-actions">
-        <button class="action-btn" id="btn-fav" onclick="toggleFavorito('${q.replace(/'/g,"\\'")}')">
-          ${isFav?'❤️ Favoritado':'🤍 Favoritar'}
-        </button>
-        <button class="action-btn" onclick="abrirShare()">📤 Compartilhar</button>
-        <button class="action-btn" id="btn-copiar" onclick="copiarResposta()">📋 Copiar</button>
+        <button class="action-btn" id="btn-fav">${isFav ? '❤️ Favoritado' : '🤍 Favoritar'}</button>
+        <button class="action-btn" id="btn-share">📤 Compartilhar</button>
+        <button class="action-btn" id="btn-copiar">📋 Copiar</button>
       </div>`;
-  } catch(err) {
+
+    const btnFav = document.getElementById('btn-fav');
+    btnFav.addEventListener('click', () => toggleFavorito(q, btnFav));
+
+    document.getElementById('btn-share').addEventListener('click', () => abrirShare(q));
+    document.getElementById('btn-copiar').addEventListener('click', copiarResposta);
+
+  } catch (err) {
     card.innerHTML = `<div style="color:#E8825A;font-size:14px">⚠️ Erro: ${err.message}</div>`;
   }
   input.value = '';

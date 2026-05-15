@@ -8,8 +8,12 @@ export default async function handler(req, res) {
 
   const { query } = req.query;
 
-  if (!query) {
-    return res.status(400).json({ error: 'Parâmetro "query" ausente' });
+  // FIX #7: validação de presença, tipo e tamanho máximo do query
+  if (!query || typeof query !== 'string') {
+    return res.status(400).json({ error: 'Parâmetro "query" ausente ou inválido' });
+  }
+  if (query.length > 100) {
+    return res.status(400).json({ error: 'Parâmetro "query" excede o limite de 100 caracteres' });
   }
 
   try {
