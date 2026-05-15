@@ -595,7 +595,7 @@ body::before {
   color: var(--accent);
   background: rgba(245, 166, 35, .07);
 }
-/* ===== CORREÇÃO GERAL DOS MODAIS ===== */
+/* ===== FIX CLIQUES NOS MODAIS ===== */
 .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -607,6 +607,7 @@ body::before {
   align-items: center !important;
   justify-content: center !important;
   padding: 20px !important;
+  pointer-events: all !important;
 }
 
 .modal-box {
@@ -620,13 +621,24 @@ body::before {
   overflow-y: auto !important;
   position: relative !important;
   z-index: 10000 !important;
+  pointer-events: all !important;
+}
+
+.modal-box button,
+.modal-box input,
+.modal-box select,
+.modal-box .action-btn,
+.modal-close {
+  position: relative !important;
+  z-index: 10001 !important;
+  pointer-events: all !important;
+  cursor: pointer !important;
 }
 
 .modal-box--wide {
   max-width: 500px !important;
 }
 
-/* Onboarding específico */
 .onboarding-box {
   background: #1C2230 !important;
   border: 1px solid #2A3040 !important;
@@ -637,65 +649,12 @@ body::before {
   text-align: center !important;
   position: relative !important;
   z-index: 10000 !important;
+  pointer-events: all !important;
 }
 
-.onboarding-cards {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 8px !important;
-  margin-bottom: 1.5rem !important;
-}
-
-.onboarding-card {
-  background: #0D1117 !important;
-  border: 1px solid #2A3040 !important;
-  border-radius: 12px !important;
-  padding: 12px !important;
-  display: flex !important;
-  gap: 8px !important;
-  align-items: center !important;
-  font-size: 12px !important;
-  color: #8B949E !important;
-  text-align: left !important;
-}
-
-/* Formulários dentro dos modais */
-.calc-field input,
-.calc-field select {
-  background: #161B22 !important;
-  border: 1px solid #2A3040 !important;
-  border-radius: 10px !important;
-  padding: 10px 12px !important;
-  font-size: 13px !important;
-  color: #F0EDE6 !important;
-  font-family: 'DM Sans', sans-serif !important;
-  outline: none !important;
-  width: 100% !important;
-}
-
-.modal-badge {
-  font-size: 11px !important;
-  color: #F5A623 !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
-  margin-bottom: 1rem !important;
-  font-weight: 500 !important;
-  display: block !important;
-}
-
-.modal-close {
-  width: 100% !important;
-  padding: 12px !important;
-  background: #F5A623 !important;
-  color: #0D1117 !important;
-  border: none !important;
-  border-radius: 12px !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
+.onboarding-box button {
+  position: relative !important;
+  z-index: 10001 !important;
+  pointer-events: all !important;
   cursor: pointer !important;
-  font-family: 'DM Sans', sans-serif !important;
-}
-
-.modal-close:hover {
-  background: #E8825A !important;
 }
