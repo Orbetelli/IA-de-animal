@@ -1,5 +1,10 @@
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
+// PERF #7: valida a chave na cold start para falhar rápido e não só na primeira chamada
+if (!process.env.GROQ_API_KEY) {
+  console.error('[chat] GROQ_API_KEY não definida — as chamadas vão falhar.');
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' });
@@ -29,19 +34,29 @@ export default async function handler(req, res) {
   messages.push({ role: 'user', content: pergunta });
 
   try {
-    const groqRes = await fetch(GROQ_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 1000,
-        temperature: 0.7,
-        messages
-      })
-    });
+    // PERF #6: timeout de 25s para não deixar a serverless pendurada indefinidamente
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+    let groqRes;
+    try {
+      groqRes = await fetch(GROQ_URL, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          max_tokens: 1000,
+          temperature: 0.7,
+          messages
+        })
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const data = await groqRes.json();
 

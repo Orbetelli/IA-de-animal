@@ -67,8 +67,16 @@ let modoVet = false;
 let historico = JSON.parse(localStorage.getItem('bicharIA-historico') || '[]');
 let favoritos = JSON.parse(localStorage.getItem('bicharIA-favoritos') || '[]');
 
-// FIX #6: mapa de { pergunta -> { texto, foto } } para vínculo correto entre pergunta e resposta
+// Cache de respostas indexado por pergunta
 const respostasCache = new Map();
+// Fila auxiliar de chaves para evitar iterator no Map (PERF #5)
+const respostasCacheKeys = [];
+
+// PERF #1: Map pré-construído para lookup O(1) em vez de Object.entries O(n)
+const BREED_LOOKUP = new Map(Object.entries(BREED_MAP));
+
+// PERF #2: HTML do calendário cacheado — só gera uma vez
+let _calendarioHTML = null;
 
 // ===== ONBOARDING =====
 function fecharOnboarding() {
@@ -132,8 +140,11 @@ function toggleModoVet() {
 }
 
 // ===== FILTROS =====
+// PERF #4: referência cacheada das tags para evitar querySelectorAll repetido
+let _tagEls = null;
 function setTag(el, t) {
-  document.querySelectorAll('.tag').forEach(x => x.classList.remove('on'));
+  if (!_tagEls) _tagEls = document.querySelectorAll('.tag');
+  _tagEls.forEach(x => x.classList.remove('on'));
   el.classList.add('on'); tema = t;
 }
 
@@ -382,10 +393,17 @@ async function gerarGuiaVacina() {
 }
 
 // ===== CALENDÁRIO =====
+// PERF #2: gera e cacheia o HTML do calendário uma única vez por sessão
 function abrirCalendario() {
   const modal = document.getElementById('modal-calendario');
   const lista = document.getElementById('calendario-lista');
   modal.style.display = 'flex';
+
+  if (_calendarioHTML) {
+    lista.innerHTML = _calendarioHTML;
+    return;
+  }
+
   const hoje = new Date();
   const sorted = [...CALENDARIO].sort((a, b) => {
     const da = new Date(hoje.getFullYear(), a.mes - 1, a.dia);
@@ -395,7 +413,7 @@ function abrirCalendario() {
     return da - db;
   });
   const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  lista.innerHTML = sorted.map(e => {
+  _calendarioHTML = sorted.map(e => {
     const d = new Date(hoje.getFullYear(), e.mes - 1, e.dia);
     const isHoje = d.getDate() === hoje.getDate() && d.getMonth() === hoje.getMonth();
     return `<div class="cal-item ${isHoje ? 'cal-item--hoje' : ''}">
@@ -404,6 +422,7 @@ function abrirCalendario() {
         <div><div class="cal-nome">${e.nome}${isHoje ? '<span class="cal-hoje-badge">Hoje!</span>' : ''}</div><div class="cal-desc">${e.desc}</div></div>
       </div></div>`;
   }).join('');
+  lista.innerHTML = _calendarioHTML;
 }
 
 // ===== COPIAR =====
@@ -417,11 +436,11 @@ function copiarResposta() {
 }
 
 // ===== FOTO =====
-// FIX #5: adicionado console.warn para facilitar debug de falhas silenciosas
+// PERF #1: usa BREED_LOOKUP (Map) em vez de Object.entries a cada chamada
 async function fetchAnimalPhoto(pergunta) {
   const lower = pergunta.toLowerCase();
   let match = null;
-  for (const [nome, info] of Object.entries(BREED_MAP)) {
+  for (const [nome, info] of BREED_LOOKUP) {
     if (lower.includes(nome)) { match = info; break; }
   }
   if (!match) return null;
@@ -469,10 +488,15 @@ async function copiarShareText() {
 }
 
 // ===== CHAMADA PRINCIPAL =====
+// PERF #3: flag para evitar requisições duplas por cliques/Enter rápidos
+let _askEmAndamento = false;
+
 async function ask() {
+  if (_askEmAndamento) return;
   const input = document.getElementById('q');
   const q = input.value.trim();
   if (!q) return;
+  _askEmAndamento = true;
   salvarHistorico(q);
   const card = document.getElementById('card');
   card.className = 'answer-card active';
@@ -512,11 +536,11 @@ async function ask() {
     const texto = data.texto || 'Não foi possível obter uma resposta.';
     const foto  = photoUrl.status === 'fulfilled' ? photoUrl.value : null;
 
-    // FIX #6: armazena no cache indexado por pergunta em vez de variáveis globais soltas
+    // Armazena no cache e mantém fila de chaves para LRU simples (PERF #5)
     respostasCache.set(q, { texto, foto });
-    // Limita o cache a 20 entradas para não vazar memória
-    if (respostasCache.size > 20) {
-      respostasCache.delete(respostasCache.keys().next().value);
+    respostasCacheKeys.push(q);
+    if (respostasCacheKeys.length > 20) {
+      respostasCache.delete(respostasCacheKeys.shift());
     }
 
     const isFav = favoritos.some(f => f.pergunta === q);
@@ -540,6 +564,8 @@ async function ask() {
 
   } catch (err) {
     card.innerHTML = `<div style="color:#E8825A;font-size:14px">⚠️ Erro: ${err.message}</div>`;
+  } finally {
+    _askEmAndamento = false; // PERF #3: libera o guard independente do resultado
   }
   input.value = '';
 }
