@@ -374,6 +374,34 @@ async function fetchAnimalPhoto(pergunta) {
   return null;
 }
 
+
+// ===== COMPARTILHAR =====
+function abrirShare() {
+  if (!ultimoTexto) return;
+  const modal = document.getElementById('modal-share');
+  const foto  = document.getElementById('share-foto');
+  const texto = document.getElementById('share-texto');
+  if (!modal) return;
+  if (ultimaFoto) { foto.src = ultimaFoto; foto.style.display = 'block'; }
+  else { foto.style.display = 'none'; }
+  texto.textContent = ultimoTexto.slice(0, 280) + (ultimoTexto.length > 280 ? '...' : '');
+  modal.style.display = 'flex';
+}
+
+function fecharShare() {
+  const modal = document.getElementById('modal-share');
+  if (modal) modal.style.display = 'none';
+}
+
+async function copiarShareText() {
+  const texto = document.getElementById('share-texto').textContent;
+  await navigator.clipboard.writeText(texto + '
+
+🐾 bicharIA.vercel.app');
+  const btn = document.getElementById('btn-share-copiar');
+  if (btn) { btn.textContent = '✅ Copiado!'; setTimeout(() => { btn.textContent = '📋 Copiar texto'; }, 2000); }
+}
+
 // ===== CHAMADA PRINCIPAL =====
 async function ask() {
   const input = document.getElementById('q');
@@ -408,6 +436,7 @@ async function ask() {
         <button class="action-btn" id="btn-fav" onclick="toggleFavorito('${q.replace(/'/g,"\\'")}')">
           ${isFav?'❤️ Favoritado':'🤍 Favoritar'}
         </button>
+        <button class="action-btn" onclick="abrirShare()">📤 Compartilhar</button>
         <button class="action-btn" id="btn-copiar" onclick="copiarResposta()">📋 Copiar</button>
       </div>`;
   } catch(err) {
