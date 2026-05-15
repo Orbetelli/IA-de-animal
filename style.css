@@ -479,3 +479,31 @@ input:checked + .toggle-sl::before { transform:translateX(20px); }
   .container { padding:0 16px; }
   .animal-grid { grid-template-columns:repeat(2,1fr); }
 }
+
+/* ===== BOTÃO LIMPAR HISTÓRICO ===== */
+.historico-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.btn-limpar-hist {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color .18s, color .18s, background .18s;
+  line-height: 1.6;
+}
+.btn-limpar-hist:hover {
+  border-color: var(--accent2);
+  color: var(--accent2);
+  background: rgba(232,130,90,.07);
+}
+.btn-limpar-hist:active {
+  transform: scale(.96);
+}

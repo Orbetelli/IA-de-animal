@@ -172,6 +172,12 @@ function salvarHistorico(pergunta) {
   renderHistorico();
 }
 
+function limparHistorico() {
+  historico = [];
+  localStorage.removeItem('bicharIA-historico');
+  renderHistorico();
+}
+
 function renderHistorico() {
   const wrap = document.getElementById('historico-wrap');
   const lista = document.getElementById('historico-lista');
@@ -179,7 +185,6 @@ function renderHistorico() {
   if (historico.length === 0) { wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
 
-  // FIX #3: removida interpolação direta de string no onclick — usando data-attribute
   lista.innerHTML = historico.map(h => {
     const label = h.length > 40 ? h.slice(0, 40) + '…' : h;
     return `<span class="hist-pill" data-pergunta="${h.replace(/"/g,'&quot;')}">🕐 ${label}</span>`;
@@ -188,6 +193,14 @@ function renderHistorico() {
   lista.querySelectorAll('.hist-pill').forEach(pill => {
     pill.addEventListener('click', () => go(pill.dataset.pergunta));
   });
+
+  // Botão de limpar — recria sempre para evitar listeners duplicados
+  const btnLimpar = document.getElementById('btn-limpar-historico');
+  if (btnLimpar) {
+    btnLimpar.replaceWith(btnLimpar.cloneNode(true));
+    document.getElementById('btn-limpar-historico')
+      .addEventListener('click', limparHistorico);
+  }
 }
 
 // ===== FAVORITOS =====
