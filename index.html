@@ -9,145 +9,60 @@
 </head>
 <body>
 
-<!-- ===== ONBOARDING ===== -->
-<div id="onboarding" class="modal-overlay" style="display:none">
-  <div class="modal-box onboarding-box">
-    <div class="onboarding-logo">🐾</div>
-    <h2 class="onboarding-titulo">Bem-vindo ao <em>BicharIA</em></h2>
-    <p class="onboarding-sub">Sua IA especialista no mundo animal</p>
-    <div class="onboarding-cards">
-      <div class="onboarding-card"><span>🤖</span><span>IA especialista em centenas de animais</span></div>
-      <div class="onboarding-card"><span>📋</span><span>Fichas técnicas com estrelas de avaliação</span></div>
-      <div class="onboarding-card"><span>⚡</span><span>Comparador entre raças e espécies</span></div>
-      <div class="onboarding-card"><span>🩺</span><span>Modo veterinário para dúvidas de saúde</span></div>
-      <div class="onboarding-card"><span>🍖</span><span>Calculadora de ração personalizada</span></div>
-      <div class="onboarding-card"><span>💉</span><span>Guia de vacinação por espécie</span></div>
+<!-- TELA DE BOAS-VINDAS -->
+<div id="onboarding" class="ob-overlay">
+  <div class="ob-box">
+    <div class="ob-paw">🐾</div>
+    <h2 class="ob-titulo">Bem-vindo ao <em>BicharIA</em></h2>
+    <p class="ob-sub">Sua IA especialista no mundo animal</p>
+    <div class="ob-grid">
+      <div class="ob-card"><span>🤖</span><span>IA especialista em centenas de animais</span></div>
+      <div class="ob-card"><span>⚡</span><span>Comparador entre raças e espécies</span></div>
+      <div class="ob-card"><span>🩺</span><span>Modo veterinário para dúvidas de saúde</span></div>
+      <div class="ob-card"><span>🍖</span><span>Calculadora de ração personalizada</span></div>
+      <div class="ob-card"><span>💉</span><span>Guia de vacinação por espécie</span></div>
+      <div class="ob-card"><span>❤️</span><span>Salve seus animais favoritos</span></div>
     </div>
-    <button class="modal-close" onclick="fecharOnboarding()">Explorar agora 🐾</button>
+    <button class="ob-btn" onclick="fecharOnboarding()">Explorar agora 🐾</button>
   </div>
 </div>
 
-<!-- ===== CURIOSIDADE DO DIA ===== -->
-<div id="modal-curiosidade" class="modal-overlay" style="display:none">
-  <div class="modal-box">
-    <div class="modal-badge">🌟 Curiosidade do dia</div>
-    <div id="modal-curiosidade-texto" class="modal-texto">Carregando...</div>
-    <button class="modal-close" onclick="fecharCuriosidade()">Entendi! 🐾</button>
+<!-- CURIOSIDADE DO DIA -->
+<div id="modal-curiosidade" class="simple-modal" style="display:none">
+  <div class="simple-box">
+    <div class="simple-badge">🌟 Curiosidade do dia</div>
+    <div id="curiosidade-texto" class="simple-texto">Carregando...</div>
+    <button class="simple-btn" onclick="document.getElementById('modal-curiosidade').style.display='none'">Entendi! 🐾</button>
   </div>
 </div>
 
-<!-- ===== FAVORITOS ===== -->
-<div id="modal-favoritos" class="modal-overlay" style="display:none">
-  <div class="modal-box modal-box--wide">
-    <div class="modal-badge">❤️ Meus Favoritos</div>
+<!-- FAVORITOS -->
+<div id="modal-favoritos" class="simple-modal" style="display:none">
+  <div class="simple-box simple-box--wide">
+    <div class="simple-badge">❤️ Meus Favoritos</div>
     <div id="favoritos-lista"></div>
-    <button class="modal-close" onclick="fecharFavoritos()" style="margin-top:1rem">Fechar</button>
+    <button class="simple-btn-outline" onclick="document.getElementById('modal-favoritos').style.display='none'" style="margin-top:1rem">Fechar</button>
   </div>
 </div>
 
-<!-- ===== COMPARADOR ===== -->
-<div id="modal-comparador" class="modal-overlay" style="display:none">
-  <div class="modal-box modal-box--wide">
-    <div class="modal-badge">⚡ Comparador de Animais</div>
-    <div id="comparador-selecao"></div>
-    <button class="action-btn" onclick="fecharComparador()" style="margin-top:.75rem;width:100%;text-align:center">✕ Fechar</button>
+<!-- COMPARADOR -->
+<div id="modal-comparador" class="simple-modal" style="display:none">
+  <div class="simple-box simple-box--wide">
+    <div class="simple-badge">⚡ Comparador de Animais</div>
+    <div id="comparador-area"></div>
+    <button class="simple-btn-outline" onclick="document.getElementById('modal-comparador').style.display='none'" style="margin-top:.75rem;width:100%">✕ Fechar</button>
   </div>
 </div>
 
-<!-- ===== CALENDÁRIO ===== -->
-<div id="modal-calendario" class="modal-overlay" style="display:none">
-  <div class="modal-box modal-box--wide">
-    <div class="modal-badge">📅 Calendário Animal</div>
-    <div id="calendario-lista" class="calendario-lista"></div>
-    <button class="modal-close" onclick="fecharCalendario()" style="margin-top:1rem">Fechar</button>
+<!-- CALENDÁRIO -->
+<div id="modal-calendario" class="simple-modal" style="display:none">
+  <div class="simple-box simple-box--wide">
+    <div class="simple-badge">📅 Calendário Animal</div>
+    <div id="calendario-lista" class="cal-lista"></div>
+    <button class="simple-btn-outline" onclick="document.getElementById('modal-calendario').style.display='none'" style="margin-top:1rem;width:100%">Fechar</button>
   </div>
 </div>
 
-<!-- ===== CALCULADORA DE RAÇÃO ===== -->
-<div id="modal-calculadora" class="modal-overlay" style="display:none">
-  <div class="modal-box modal-box--wide">
-    <div class="modal-badge">🍖 Calculadora de Ração</div>
-    <div class="calc-form">
-      <div class="calc-row">
-        <div class="calc-field">
-          <label>Espécie</label>
-          <select id="calc-especie">
-            <option value="cão">🐕 Cão</option>
-            <option value="gato">🐱 Gato</option>
-            <option value="coelho">🐇 Coelho</option>
-            <option value="cavalo">🐴 Cavalo</option>
-            <option value="hamster">🐹 Hamster</option>
-          </select>
-        </div>
-        <div class="calc-field">
-          <label>Castrado(a)?</label>
-          <select id="calc-castrado">
-            <option value="sim">Sim</option>
-            <option value="não">Não</option>
-          </select>
-        </div>
-      </div>
-      <div class="calc-row">
-        <div class="calc-field">
-          <label>Raça (opcional)</label>
-          <input type="text" id="calc-raca" placeholder="Ex: Golden Retriever">
-        </div>
-      </div>
-      <div class="calc-row">
-        <div class="calc-field">
-          <label>Peso (kg)</label>
-          <input type="number" id="calc-peso" placeholder="Ex: 8.5" min="0.1" step="0.1">
-        </div>
-        <div class="calc-field">
-          <label>Idade</label>
-          <input type="text" id="calc-idade" placeholder="Ex: 2 anos">
-        </div>
-      </div>
-      <button class="modal-close" onclick="calcularRacao()" style="margin-bottom:.75rem">Calcular 🍖</button>
-    </div>
-    <div id="calc-resultado"></div>
-    <button class="action-btn" onclick="fecharCalculadora()" style="width:100%;text-align:center;margin-top:.5rem">✕ Fechar</button>
-  </div>
-</div>
-
-<!-- ===== GUIA DE VACINAÇÃO ===== -->
-<div id="modal-vacina" class="modal-overlay" style="display:none">
-  <div class="modal-box modal-box--wide">
-    <div class="modal-badge">💉 Guia de Vacinação</div>
-    <div class="calc-form">
-      <div class="calc-row">
-        <div class="calc-field">
-          <label>Espécie</label>
-          <select id="vacina-especie">
-            <option value="cão">🐕 Cão</option>
-            <option value="gato">🐱 Gato</option>
-            <option value="coelho">🐇 Coelho</option>
-            <option value="cavalo">🐴 Cavalo</option>
-          </select>
-        </div>
-        <div class="calc-field">
-          <label>Local</label>
-          <select id="vacina-local">
-            <option value="Brasil">🇧🇷 Brasil</option>
-            <option value="Portugal">🇵🇹 Portugal</option>
-            <option value="Internacional">🌍 Internacional</option>
-          </select>
-        </div>
-      </div>
-      <div class="calc-row">
-        <div class="calc-field">
-          <label>Idade do animal</label>
-          <input type="text" id="vacina-idade" placeholder="Ex: 3 meses, 2 anos">
-        </div>
-      </div>
-      <button class="modal-close" onclick="gerarGuiaVacina()" style="margin-bottom:.75rem">Gerar guia 💉</button>
-    </div>
-    <div id="vacina-resultado"></div>
-    <button class="action-btn" onclick="fecharVacinacao()" style="width:100%;text-align:center;margin-top:.5rem">✕ Fechar</button>
-  </div>
-</div>
-
-<!-- ===== CONTAINER PRINCIPAL ===== -->
 <div class="container">
 
   <!-- HERO -->
@@ -158,24 +73,22 @@
     <p>Explore raças, comportamentos, alimentação e curiosidades de cães, gatos, coelhos, cavalos e muito mais.</p>
   </div>
 
-  <!-- BARRA DE FERRAMENTAS -->
+  <!-- TOOLBAR -->
   <div class="toolbar">
     <button class="tool-btn" onclick="abrirComparador()">⚡ Comparar</button>
-    <button class="tool-btn" onclick="abrirCalculadora()">🍖 Ração</button>
-    <button class="tool-btn" onclick="abrirVacinacao()">💉 Vacinas</button>
     <button class="tool-btn" onclick="abrirCalendario()">📅 Calendário</button>
     <button class="tool-btn" onclick="abrirFavoritos()">❤️ Favoritos</button>
   </div>
 
   <!-- MODO VETERINÁRIO -->
-  <div class="chat-toggle-wrap">
-    <div class="chat-toggle-label">
-      <span>🩺 Modo Veterinário <span id="vet-badge" class="vet-badge" style="display:none">ATIVO</span></span>
-      <span class="chat-toggle-sub">Respostas técnicas de saúde animal</span>
+  <div class="vet-toggle">
+    <div>
+      <span class="vet-titulo">🩺 Modo Veterinário <span id="vet-badge" class="vet-badge" style="display:none">ATIVO</span></span>
+      <span class="vet-sub">Respostas técnicas de saúde animal</span>
     </div>
-    <label class="toggle-switch">
+    <label class="toggle-sw">
       <input type="checkbox" id="toggle-vet" onchange="toggleModoVet()">
-      <span class="toggle-slider"></span>
+      <span class="toggle-sl"></span>
     </label>
   </div>
 
@@ -193,32 +106,119 @@
   <div class="search-wrap">
     <input type="text" id="q" placeholder="Pergunte qualquer coisa sobre animais..."
       onkeydown="if(event.key==='Enter') ask()"/>
-    <button class="search-btn" onclick="ask()" title="Perguntar">↑</button>
+    <button class="search-btn" onclick="ask()">↑</button>
   </div>
 
   <!-- HISTÓRICO -->
-  <div id="historico-wrap" style="display:none; margin-bottom: 1.25rem;">
-    <div class="section-label" style="margin-bottom: 8px;">🕐 Perguntas recentes</div>
+  <div id="historico-wrap" style="display:none;margin-bottom:1.25rem">
+    <div class="section-label" style="margin-bottom:8px">🕐 Perguntas recentes</div>
     <div id="historico-lista" class="historico-lista"></div>
   </div>
 
-  <!-- SUGESTÕES RÁPIDAS -->
+  <!-- SUGESTÕES -->
   <div class="quick">
     <span class="qpill" onclick="go('Quais raças de cachorro são boas para apartamento?')">Raças p/ apartamento</span>
     <span class="qpill" onclick="go('Capivara pode ser criada como pet?')">Capivara como pet?</span>
     <span class="qpill" onclick="go('Qual a origem do Shiba Inu?')">Origem do Shiba Inu</span>
     <span class="qpill" onclick="go('Gato Maine Coon: características e curiosidades')">Maine Coon</span>
     <span class="qpill" onclick="go('Cachorros sonham de verdade?')">Cachorros sonham?</span>
-    <span class="qpill" onclick="go('Coelho Lionhead tem cuidados especiais?')">Cuidados do Lionhead</span>
   </div>
 
   <!-- RESPOSTA DA IA -->
   <div class="answer-card" id="card">
-    <div class="placeholder">Faça uma pergunta acima ou escolha um animal abaixo para começar sua exploração. 🐾</div>
+    <div class="placeholder">Faça uma pergunta acima ou escolha um animal abaixo. 🐾</div>
   </div>
 
-  <!-- ACORDEÃO -->
-  <div class="section-label" style="margin-bottom: 12px;">Explorar animais</div>
+  <!-- CALCULADORA DE RAÇÃO — SEÇÃO FIXA -->
+  <div class="section-card">
+    <div class="section-card-header" onclick="toggleSection('calc')">
+      <span>🍖 Calculadora de Ração</span>
+      <span id="arrow-calc" class="section-arrow">▼</span>
+    </div>
+    <div id="panel-calc" class="section-panel">
+      <div class="tool-form">
+        <div class="tool-row">
+          <div class="tool-field">
+            <label>Espécie</label>
+            <select id="calc-especie">
+              <option value="cão">🐕 Cão</option>
+              <option value="gato">🐱 Gato</option>
+              <option value="coelho">🐇 Coelho</option>
+              <option value="cavalo">🐴 Cavalo</option>
+              <option value="hamster">🐹 Hamster</option>
+            </select>
+          </div>
+          <div class="tool-field">
+            <label>Castrado(a)?</label>
+            <select id="calc-castrado">
+              <option value="sim">Sim</option>
+              <option value="não">Não</option>
+            </select>
+          </div>
+        </div>
+        <div class="tool-row">
+          <div class="tool-field">
+            <label>Raça (opcional)</label>
+            <input type="text" id="calc-raca" placeholder="Ex: Golden Retriever">
+          </div>
+        </div>
+        <div class="tool-row">
+          <div class="tool-field">
+            <label>Peso (kg)</label>
+            <input type="number" id="calc-peso" placeholder="Ex: 8.5" min="0.1" step="0.1">
+          </div>
+          <div class="tool-field">
+            <label>Idade</label>
+            <input type="text" id="calc-idade" placeholder="Ex: 2 anos">
+          </div>
+        </div>
+        <button class="tool-submit" onclick="calcularRacao()">Calcular 🍖</button>
+        <div id="calc-resultado" class="tool-resultado"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUIA DE VACINAÇÃO — SEÇÃO FIXA -->
+  <div class="section-card">
+    <div class="section-card-header" onclick="toggleSection('vacina')">
+      <span>💉 Guia de Vacinação</span>
+      <span id="arrow-vacina" class="section-arrow">▼</span>
+    </div>
+    <div id="panel-vacina" class="section-panel">
+      <div class="tool-form">
+        <div class="tool-row">
+          <div class="tool-field">
+            <label>Espécie</label>
+            <select id="vacina-especie">
+              <option value="cão">🐕 Cão</option>
+              <option value="gato">🐱 Gato</option>
+              <option value="coelho">🐇 Coelho</option>
+              <option value="cavalo">🐴 Cavalo</option>
+            </select>
+          </div>
+          <div class="tool-field">
+            <label>País</label>
+            <select id="vacina-local">
+              <option value="Brasil">🇧🇷 Brasil</option>
+              <option value="Portugal">🇵🇹 Portugal</option>
+              <option value="Internacional">🌍 Internacional</option>
+            </select>
+          </div>
+        </div>
+        <div class="tool-row">
+          <div class="tool-field">
+            <label>Idade do animal</label>
+            <input type="text" id="vacina-idade" placeholder="Ex: 3 meses, 2 anos">
+          </div>
+        </div>
+        <button class="tool-submit" onclick="gerarGuiaVacina()">Gerar guia 💉</button>
+        <div id="vacina-resultado" class="tool-resultado"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACORDEÃO DE ANIMAIS -->
+  <div class="section-label" style="margin-bottom:12px;margin-top:.5rem">Explorar animais</div>
   <div class="accordion">
 
     <!-- CÃES -->
@@ -323,9 +323,9 @@
       </div>
       <div class="accordion-panel" id="panel-cavalos">
         <div class="animal-grid">
-          <div class="animal-card" onclick="go('Cavalo Árabe: características, origem e elegância')"><div class="animal-icon">🌙</div><div class="animal-name">Árabe</div></div>
+          <div class="animal-card" onclick="go('Cavalo Árabe: características e elegância')"><div class="animal-icon">🌙</div><div class="animal-name">Árabe</div></div>
           <div class="animal-card" onclick="go('Appaloosa: o cavalo das manchas')"><div class="animal-icon">🎨</div><div class="animal-name">Appaloosa</div></div>
-          <div class="animal-card" onclick="go('Cavalo Andaluz: características e elegância')"><div class="animal-icon">💃</div><div class="animal-name">Andaluz</div></div>
+          <div class="animal-card" onclick="go('Cavalo Andaluz: características')"><div class="animal-icon">💃</div><div class="animal-name">Andaluz</div></div>
           <div class="animal-card" onclick="go('Campolina: raça brasileira e marcha')"><div class="animal-icon">🇧🇷</div><div class="animal-name">Campolina</div></div>
           <div class="animal-card" onclick="go('Clydesdale: o gigante escocês')"><div class="animal-icon">🏴󠁧󠁢󠁳󠁣󠁴󠁿</div><div class="animal-name">Clydesdale</div></div>
           <div class="animal-card" onclick="go('Cavalo Frísio: o elegante cavalo preto')"><div class="animal-icon">🖤</div><div class="animal-name">Frísio</div></div>
@@ -335,13 +335,13 @@
           <div class="animal-card" onclick="go('Paint Horse: características e pelagem colorida')"><div class="animal-icon">🎭</div><div class="animal-name">Paint Horse</div></div>
           <div class="animal-card" onclick="go('Pônei Shetland: o menor pônei')"><div class="animal-icon">🐾</div><div class="animal-name">Pônei Shetland</div></div>
           <div class="animal-card" onclick="go('Puro Sangue Inglês: o cavalo mais rápido')"><div class="animal-icon">🏆</div><div class="animal-name">Puro Sangue</div></div>
-          <div class="animal-card" onclick="go('Quarto de Milha: o cavalo mais popular do mundo')"><div class="animal-icon">💨</div><div class="animal-name">Quarto de Milha</div></div>
+          <div class="animal-card" onclick="go('Quarto de Milha: o cavalo mais popular')"><div class="animal-icon">💨</div><div class="animal-name">Quarto de Milha</div></div>
           <div class="animal-card" onclick="go('Cavalo Shire: o maior cavalo do mundo')"><div class="animal-icon">🦣</div><div class="animal-name">Shire</div></div>
         </div>
       </div>
     </div>
 
-    <!-- COELHOS & LEBRES -->
+    <!-- COELHOS -->
     <div class="accordion-item">
       <div class="accordion-header" onclick="toggleAccordion('coelhos')">
         <div class="accordion-title"><span class="accordion-icon">🐇</span><span>Coelhos & Lebres</span><span class="accordion-badge">14 raças</span></div>
@@ -417,7 +417,7 @@
   </div><!-- /accordion -->
 
   <!-- STATS -->
-  <div class="stats" style="margin-top: 2rem;">
+  <div class="stats" style="margin-top:2rem">
     <div class="stat"><div class="stat-num">400+</div><div class="stat-lbl">raças de cães</div></div>
     <div class="stat"><div class="stat-num">50+</div><div class="stat-lbl">raças de coelhos</div></div>
     <div class="stat"><div class="stat-num">8,7 mi</div><div class="stat-lbl">espécies animais</div></div>
@@ -425,7 +425,7 @@
 
   <div class="footer">BicharIA &bull; feita por Orbetelli/Claude AI</div>
 
-</div><!-- /container -->
+</div>
 <script src="app.js"></script>
 </body>
 </html>
