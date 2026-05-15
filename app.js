@@ -127,6 +127,8 @@ async function carregarCuriosidade() {
 function toggleModoVet() {
   modoVet = document.getElementById('toggle-vet').checked;
   document.getElementById('vet-badge').style.display = modoVet ? 'inline-flex' : 'none';
+  // UX/UI: borda verde no container quando ativo
+  document.querySelector('.vet-toggle').classList.toggle('vet-ativo', modoVet);
 }
 
 // ===== FILTROS =====
@@ -461,7 +463,15 @@ async function ask() {
   salvarHistorico(q);
   const card = document.getElementById('card');
   card.className = 'answer-card active';
-  card.innerHTML = `<div class="answer-label"><span class="dot"></span> ${randomLoadingMsg()}</div><div class="loading-dots"><span>●</span> <span>●</span> <span>●</span></div>`;
+  // UX/UI: skeleton loader em vez de 3 pontos simples
+  card.innerHTML = `
+    <div class="answer-label"><span class="dot"></span> ${randomLoadingMsg()}</div>
+    <div class="skeleton-wrap">
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+    </div>`;
 
   const temaFinal = modoVet
     ? 'Responda como veterinário especialista. Seja técnico, preciso e sempre recomende consulta presencial.'
@@ -521,8 +531,28 @@ async function ask() {
   input.value = '';
 }
 
+// ===== RIPPLE NOS TOOL BUTTONS =====
+// UX/UI: efeito de onda no clique dos botões da toolbar
+function addRipple(e) {
+  const btn = e.currentTarget;
+  const circle = document.createElement('span');
+  const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+  const radius = diameter / 2;
+  const rect = btn.getBoundingClientRect();
+  circle.style.width = circle.style.height = `${diameter}px`;
+  circle.style.left = `${e.clientX - rect.left - radius}px`;
+  circle.style.top  = `${e.clientY - rect.top  - radius}px`;
+  circle.classList.add('ripple');
+  btn.querySelector('.ripple')?.remove();
+  btn.appendChild(circle);
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   renderHistorico();
   verificarOnboarding();
+  // Aplica ripple em todos os tool-btn
+  document.querySelectorAll('.tool-btn').forEach(btn => {
+    btn.addEventListener('click', addRipple);
+  });
 });
