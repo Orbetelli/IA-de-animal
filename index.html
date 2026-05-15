@@ -10,20 +10,20 @@
 <body>
 
 <!-- TELA DE BOAS-VINDAS -->
-<div id="onboarding" class="ob-overlay">
-  <div class="ob-box">
-    <div class="ob-paw">🐾</div>
-    <h2 class="ob-titulo">Bem-vindo ao <em>BicharIA</em></h2>
-    <p class="ob-sub">Sua IA especialista no mundo animal</p>
-    <div class="ob-grid">
-      <div class="ob-card"><span>🤖</span><span>IA especialista em centenas de animais</span></div>
-      <div class="ob-card"><span>⚡</span><span>Comparador entre raças e espécies</span></div>
-      <div class="ob-card"><span>🩺</span><span>Modo veterinário para dúvidas de saúde</span></div>
-      <div class="ob-card"><span>🍖</span><span>Calculadora de ração personalizada</span></div>
-      <div class="ob-card"><span>💉</span><span>Guia de vacinação por espécie</span></div>
-      <div class="ob-card"><span>❤️</span><span>Salve seus animais favoritos</span></div>
+<div id="onboarding" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#1C2230;border:1px solid #2A3040;border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:460px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:1rem">🐾</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:.4rem;color:#F0EDE6">Bem-vindo ao <em>BicharIA</em></h2>
+    <p style="font-size:14px;color:#8B949E;margin-bottom:1.5rem">Sua IA especialista no mundo animal</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem">
+      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>🤖</span><span>IA especialista em centenas de animais</span></div>
+      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>⚡</span><span>Comparador entre raças e espécies</span></div>
+      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>🩺</span><span>Modo veterinário para dúvidas de saúde</span></div>
+      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>🍖</span><span>Calculadora de ração personalizada</span></div>
+      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>💉</span><span>Guia de vacinação por espécie</span></div>
+      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>❤️</span><span>Salve seus animais favoritos</span></div>
     </div>
-    <button class="ob-btn" onclick="fecharOnboarding()">Explorar agora 🐾</button>
+    <button style="width:100%;padding:14px;background:#F5A623;color:#0D1117;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="fecharOnboarding()">Explorar agora 🐾</button>
   </div>
 </div>
 

@@ -71,14 +71,27 @@ let compSelecionados = [];
 
 // ===== ONBOARDING =====
 function fecharOnboarding() {
-  document.getElementById('onboarding').style.display = 'none';
+  const el = document.getElementById('onboarding');
+  if (el) el.style.display = 'none';
   localStorage.setItem('bicharIA-onboarding', 'true');
   setTimeout(carregarCuriosidade, 600);
 }
 
 function verificarOnboarding() {
+  const el = document.getElementById('onboarding');
+  if (!el) return;
   if (!localStorage.getItem('bicharIA-onboarding')) {
-    document.getElementById('onboarding').style.display = 'flex';
+    el.style.display = 'flex';
+    el.style.position = 'fixed';
+    el.style.top = '0';
+    el.style.left = '0';
+    el.style.right = '0';
+    el.style.bottom = '0';
+    el.style.background = 'rgba(0,0,0,.88)';
+    el.style.zIndex = '9999';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'center';
+    el.style.padding = '20px';
   } else {
     setTimeout(carregarCuriosidade, 800);
   }
