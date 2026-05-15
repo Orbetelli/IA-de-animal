@@ -9,6 +9,43 @@
 </head>
 <body>
 
+<!-- MODAL CURIOSIDADE DO DIA -->
+<div id="modal-curiosidade" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-badge">🌟 Curiosidade do dia</div>
+    <div id="modal-texto" class="modal-texto">Carregando...</div>
+    <button class="modal-close" onclick="fecharCuriosidade()">Entendi! 🐾</button>
+  </div>
+</div>
+
+<!-- MODAL COMPARTILHAR -->
+<div id="modal-share" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-badge">📤 Compartilhar</div>
+    <div id="share-card" class="share-card">
+      <div class="share-header">
+        <span class="share-logo">🐾 BicharIA</span>
+      </div>
+      <img id="share-foto" src="" alt="" class="share-foto" style="display:none">
+      <div id="share-texto" class="share-texto"></div>
+      <div class="share-footer">bicharIA.vercel.app</div>
+    </div>
+    <div class="share-actions">
+      <button class="action-btn" onclick="copiarShareText()">📋 Copiar texto</button>
+      <button class="action-btn" onclick="fecharShare()">✕ Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FICHA TÉCNICA -->
+<div id="modal-ficha" class="modal-overlay" style="display:none">
+  <div class="modal-box modal-box--wide">
+    <div class="modal-badge">📋 Ficha Técnica</div>
+    <div id="ficha-content" class="ficha-content">Carregando...</div>
+    <button class="modal-close" onclick="fecharFicha()">Fechar</button>
+  </div>
+</div>
+
 <div class="container">
 
   <!-- HERO -->
@@ -27,6 +64,18 @@
     <span class="tag" onclick="setTag(this, 'alimentação')">🍖 Alimentação</span>
     <span class="tag" onclick="setTag(this, 'habitat')">🌿 Habitat</span>
     <span class="tag" onclick="setTag(this, 'saúde')">❤️ Saúde</span>
+  </div>
+
+  <!-- MODO CHAT TOGGLE -->
+  <div class="chat-toggle-wrap">
+    <div class="chat-toggle-label">
+      <span>💬 Modo Chat</span>
+      <span class="chat-toggle-sub">A IA lembra o contexto da conversa</span>
+    </div>
+    <label class="toggle-switch">
+      <input type="checkbox" id="toggle-chat" onchange="toggleModoChat()">
+      <span class="toggle-slider"></span>
+    </label>
   </div>
 
   <!-- BUSCA -->
@@ -52,6 +101,9 @@
     <span class="qpill" onclick="go('Coelho Lionhead tem cuidados especiais?')">Cuidados do Lionhead</span>
   </div>
 
+  <!-- HISTÓRICO DO CHAT (modo chat) -->
+  <div id="chat-history" class="chat-history" style="display:none"></div>
+
   <!-- RESPOSTA DA IA -->
   <div class="answer-card" id="card">
     <div class="placeholder">Faça uma pergunta acima ou escolha um animal abaixo para começar sua exploração. 🐾</div>
@@ -67,45 +119,62 @@
         <div class="accordion-title">
           <span class="accordion-icon">🐕</span>
           <span>Cães</span>
-          <span class="accordion-badge">32 raças</span>
+          <span class="accordion-badge">50 raças</span>
         </div>
         <span class="accordion-arrow" id="arrow-caes">▼</span>
       </div>
       <div class="accordion-panel" id="panel-caes">
         <div class="animal-grid">
-          <div class="animal-card" onclick="go('Características do Akita Inu japonês')"><div class="animal-icon">🏯</div><div class="animal-name">Akita Inu</div></div>
-          <div class="animal-card" onclick="go('Basset Hound: características e comportamento')"><div class="animal-icon">👂</div><div class="animal-name">Basset Hound</div></div>
-          <div class="animal-card" onclick="go('Características do Beagle')"><div class="animal-icon">🐕</div><div class="animal-name">Beagle</div></div>
-          <div class="animal-card" onclick="go('Características do Border Collie')"><div class="animal-icon">🐕</div><div class="animal-name">Border Collie</div></div>
-          <div class="animal-card" onclick="go('Buldogue Inglês: características e cuidados')"><div class="animal-icon">🧱</div><div class="animal-name">Buldogue Inglês</div></div>
-          <div class="animal-card" onclick="go('Características do Bulldog Francês')"><div class="animal-icon">🐾</div><div class="animal-name">Bulldog Francês</div></div>
-          <div class="animal-card" onclick="go('Chow Chow: características e personalidade')"><div class="animal-icon">🦁</div><div class="animal-name">Chow Chow</div></div>
-          <div class="animal-card" onclick="go('Cocker Spaniel: características e cuidados')"><div class="animal-icon">🐾</div><div class="animal-name">Cocker Spaniel</div></div>
-          <div class="animal-card" onclick="go('Corgi Galês: características e temperamento')"><div class="animal-icon">🍑</div><div class="animal-name">Corgi</div></div>
-          <div class="animal-card" onclick="go('Como é o Dachshund salsicha?')"><div class="animal-icon">🌭</div><div class="animal-name">Dachshund</div></div>
-          <div class="animal-card" onclick="go('Dálmata: características e curiosidades')"><div class="animal-icon">⚫</div><div class="animal-name">Dálmata</div></div>
-          <div class="animal-card" onclick="go('Doberman: características e temperamento')"><div class="animal-icon">🦾</div><div class="animal-name">Doberman</div></div>
-          <div class="animal-card" onclick="go('Características e origem do Golden Retriever')"><div class="animal-icon">🦮</div><div class="animal-name">Golden Retriever</div></div>
-          <div class="animal-card" onclick="go('Greyhound: características e curiosidades')"><div class="animal-icon">🏃</div><div class="animal-name">Greyhound</div></div>
-          <div class="animal-card" onclick="go('Características do Husky Siberiano')"><div class="animal-icon">🐺</div><div class="animal-name">Husky Siberiano</div></div>
-          <div class="animal-card" onclick="go('Características do Labrador Retriever')"><div class="animal-icon">🐶</div><div class="animal-name">Labrador</div></div>
-          <div class="animal-card" onclick="go('Características do Lobo Guará brasileiro')"><div class="animal-icon">🌾</div><div class="animal-name">Lobo Guará</div></div>
-          <div class="animal-card" onclick="go('Pastor Belga Malinois: características e temperamento')"><div class="animal-icon">🐕‍🦺</div><div class="animal-name">Malinois</div></div>
-          <div class="animal-card" onclick="go('Características do Pastor Alemão')"><div class="animal-icon">🛡️</div><div class="animal-name">Pastor Alemão</div></div>
-          <div class="animal-card" onclick="go('Pequinês: características e cuidados')"><div class="animal-icon">👑</div><div class="animal-name">Pequinês</div></div>
-          <div class="animal-card" onclick="go('Pinscher Miniatura: características e temperamento')"><div class="animal-icon">🔥</div><div class="animal-name">Pinscher</div></div>
-          <div class="animal-card" onclick="go('Pitbull: características e temperamento')"><div class="animal-icon">💪</div><div class="animal-name">Pitbull</div></div>
-          <div class="animal-card" onclick="go('Características do Poodle')"><div class="animal-icon">🐩</div><div class="animal-name">Poodle</div></div>
-          <div class="animal-card" onclick="go('Características do Rottweiler')"><div class="animal-icon">🦴</div><div class="animal-name">Rottweiler</div></div>
-          <div class="animal-card" onclick="go('Características do Samoyed')"><div class="animal-icon">🤍</div><div class="animal-name">Samoyed</div></div>
-          <div class="animal-card" onclick="go('São Bernardo: características e curiosidades')"><div class="animal-icon">🏔️</div><div class="animal-name">São Bernardo</div></div>
-          <div class="animal-card" onclick="go('Schnauzer: características e curiosidades')"><div class="animal-icon">🧔</div><div class="animal-name">Schnauzer</div></div>
-          <div class="animal-card" onclick="go('Como é o Shiba Inu?')"><div class="animal-icon">🦊</div><div class="animal-name">Shiba Inu</div></div>
-          <div class="animal-card" onclick="go('Shih Tzu: características e cuidados')"><div class="animal-icon">🐶</div><div class="animal-name">Shih Tzu</div></div>
-          <div class="animal-card" onclick="go('Spitz Alemão (Pomeranian): características e curiosidades')"><div class="animal-icon">🦊</div><div class="animal-name">Spitz Alemão</div></div>
-          <div class="animal-card" onclick="go('Weimaraner: características e temperamento')"><div class="animal-icon">⚡</div><div class="animal-name">Weimaraner</div></div>
-          <div class="animal-card" onclick="go('Whippet: características e temperamento')"><div class="animal-icon">💨</div><div class="animal-name">Whippet</div></div>
-          <div class="animal-card" onclick="go('Yorkshire Terrier: características e cuidados')"><div class="animal-icon">🎀</div><div class="animal-name">Yorkshire</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Akita Inu japonês','akita inu')"><div class="animal-icon">🏯</div><div class="animal-name">Akita Inu</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Basset Hound: características e comportamento','basset hound')"><div class="animal-icon">👂</div><div class="animal-name">Basset Hound</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Beagle','beagle')"><div class="animal-icon">🐕</div><div class="animal-name">Beagle</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Border Collie','border collie')"><div class="animal-icon">🐕</div><div class="animal-name">Border Collie</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Buldogue Inglês: características e cuidados','buldogue inglês')"><div class="animal-icon">🧱</div><div class="animal-name">Buldogue Inglês</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Bulldog Francês','bulldog francês')"><div class="animal-icon">🐾</div><div class="animal-name">Bulldog Francês</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Chow Chow: características e personalidade','chow chow')"><div class="animal-icon">🦁</div><div class="animal-name">Chow Chow</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cocker Spaniel: características e cuidados','cocker spaniel')"><div class="animal-icon">🐾</div><div class="animal-name">Cocker Spaniel</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Corgi Galês: características e temperamento','corgi')"><div class="animal-icon">🍑</div><div class="animal-name">Corgi</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Como é o Dachshund salsicha?','dachshund')"><div class="animal-icon">🌭</div><div class="animal-name">Dachshund</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Dálmata: características e curiosidades','dálmata')"><div class="animal-icon">⚫</div><div class="animal-name">Dálmata</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Doberman: características e temperamento','doberman')"><div class="animal-icon">🦾</div><div class="animal-name">Doberman</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características e origem do Golden Retriever','golden retriever')"><div class="animal-icon">🦮</div><div class="animal-name">Golden Retriever</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Greyhound: características e curiosidades','greyhound')"><div class="animal-icon">🏃</div><div class="animal-name">Greyhound</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Husky Siberiano','husky siberiano')"><div class="animal-icon">🐺</div><div class="animal-name">Husky Siberiano</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Labrador Retriever','labrador')"><div class="animal-icon">🐶</div><div class="animal-name">Labrador</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Lobo Guará brasileiro','lobo guará')"><div class="animal-icon">🌾</div><div class="animal-name">Lobo Guará</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Pastor Belga Malinois: características e temperamento','malinois')"><div class="animal-icon">🐕‍🦺</div><div class="animal-name">Malinois</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Pastor Alemão','pastor alemão')"><div class="animal-icon">🛡️</div><div class="animal-name">Pastor Alemão</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Pequinês: características e cuidados','pequinês')"><div class="animal-icon">👑</div><div class="animal-name">Pequinês</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Pinscher Miniatura: características e temperamento','pinscher')"><div class="animal-icon">🔥</div><div class="animal-name">Pinscher</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Pitbull: características e temperamento','pitbull')"><div class="animal-icon">💪</div><div class="animal-name">Pitbull</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Poodle','poodle')"><div class="animal-icon">🐩</div><div class="animal-name">Poodle</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Rottweiler','rottweiler')"><div class="animal-icon">🦴</div><div class="animal-name">Rottweiler</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do Samoyed','samoyed')"><div class="animal-icon">🤍</div><div class="animal-name">Samoyed</div></div>
+          <div class="animal-card" onclick="abrirAnimal('São Bernardo: características e curiosidades','são bernardo')"><div class="animal-icon">🏔️</div><div class="animal-name">São Bernardo</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Schnauzer: características e curiosidades','schnauzer')"><div class="animal-icon">🧔</div><div class="animal-name">Schnauzer</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Como é o Shiba Inu?','shiba inu')"><div class="animal-icon">🦊</div><div class="animal-name">Shiba Inu</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Shih Tzu: características e cuidados','shih tzu')"><div class="animal-icon">🐶</div><div class="animal-name">Shih Tzu</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Spitz Alemão: características e curiosidades','spitz alemão')"><div class="animal-icon">🦊</div><div class="animal-name">Spitz Alemão</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Weimaraner: características e temperamento','weimaraner')"><div class="animal-icon">⚡</div><div class="animal-name">Weimaraner</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Whippet: características e temperamento','whippet')"><div class="animal-icon">💨</div><div class="animal-name">Whippet</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Yorkshire Terrier: características e cuidados','yorkshire')"><div class="animal-icon">🎀</div><div class="animal-name">Yorkshire</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Australian Shepherd: características e temperamento','australian shepherd')"><div class="animal-icon">🌀</div><div class="animal-name">Australian Shepherd</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Boxer: características e temperamento','boxer')"><div class="animal-icon">🥊</div><div class="animal-name">Boxer</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Bull Terrier: características e temperamento','bull terrier')"><div class="animal-icon">🐷</div><div class="animal-name">Bull Terrier</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cane Corso: características e temperamento','cane corso')"><div class="animal-icon">🏛️</div><div class="animal-name">Cane Corso</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Chihuahua: características e curiosidades','chihuahua')"><div class="animal-icon">🫶</div><div class="animal-name">Chihuahua</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Dogo Argentino: características e temperamento','dogo argentino')"><div class="animal-icon">🤍</div><div class="animal-name">Dogo Argentino</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Fila Brasileiro: características e temperamento','fila brasileiro')"><div class="animal-icon">🇧🇷</div><div class="animal-name">Fila Brasileiro</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Jack Russell Terrier: características e energia','jack russell')"><div class="animal-icon">⚡</div><div class="animal-name">Jack Russell</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Lhasa Apso: origem e características','lhasa apso')"><div class="animal-icon">🏔️</div><div class="animal-name">Lhasa Apso</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Maltês: características e cuidados','maltês')"><div class="animal-icon">⚪</div><div class="animal-name">Maltês</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Mastiff Inglês: o maior cão do mundo','mastiff inglês')"><div class="animal-icon">🦣</div><div class="animal-name">Mastiff Inglês</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Pug: características e cuidados especiais','pug')"><div class="animal-icon">😤</div><div class="animal-name">Pug</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Shar Pei: características e cuidados com as rugas','shar pei')"><div class="animal-icon">🫁</div><div class="animal-name">Shar Pei</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Scottish Terrier: características e temperamento','scottish terrier')"><div class="animal-icon">🎩</div><div class="animal-name">Scottish Terrier</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Vizsla: o ponteiro húngaro','vizsla')"><div class="animal-icon">🍂</div><div class="animal-name">Vizsla</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Galgo Espanhol: características e curiosidades','galgo espanhol')"><div class="animal-icon">🌬️</div><div class="animal-name">Galgo Espanhol</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Xoloitzcuintle: o cão sem pelo mexicano','xoloitzcuintle')"><div class="animal-icon">🌮</div><div class="animal-name">Xoloitzcuintle</div></div>
         </div>
       </div>
     </div>
@@ -122,61 +191,26 @@
       </div>
       <div class="accordion-panel" id="panel-gatos">
         <div class="animal-grid">
-          <div class="animal-card" onclick="go('Abissínio: características e temperamento')"><div class="animal-icon">🏺</div><div class="animal-name">Abissínio</div></div>
-          <div class="animal-card" onclick="go('American Shorthair: características e temperamento')"><div class="animal-icon">🇺🇸</div><div class="animal-name">American Shorthair</div></div>
-          <div class="animal-card" onclick="go('Angorá Turco: características e cuidados')"><div class="animal-icon">✨</div><div class="animal-name">Angorá Turco</div></div>
-          <div class="animal-card" onclick="go('Gato Bengal: aparência e comportamento')"><div class="animal-icon">🐆</div><div class="animal-name">Bengal</div></div>
-          <div class="animal-card" onclick="go('Birman: características e origem')"><div class="animal-icon">🌸</div><div class="animal-name">Birman</div></div>
-          <div class="animal-card" onclick="go('Bombay: o gato pantera preto')"><div class="animal-icon">🖤</div><div class="animal-name">Bombay</div></div>
-          <div class="animal-card" onclick="go('British Shorthair: características e personalidade')"><div class="animal-icon">🇬🇧</div><div class="animal-name">British Shorthair</div></div>
-          <div class="animal-card" onclick="go('Burmese: características e temperamento')"><div class="animal-icon">🌺</div><div class="animal-name">Burmese</div></div>
-          <div class="animal-card" onclick="go('Cornish Rex: características e curiosidades')"><div class="animal-icon">🌀</div><div class="animal-name">Cornish Rex</div></div>
-          <div class="animal-card" onclick="go('Devon Rex: características e personalidade')"><div class="animal-icon">👽</div><div class="animal-name">Devon Rex</div></div>
-          <div class="animal-card" onclick="go('Exotic Shorthair: características e cuidados')"><div class="animal-icon">🍊</div><div class="animal-name">Exotic Shorthair</div></div>
-          <div class="animal-card" onclick="go('Como é o gato Maine Coon?')"><div class="animal-icon">🦁</div><div class="animal-name">Maine Coon</div></div>
-          <div class="animal-card" onclick="go('Manx: o gato sem cauda, características e curiosidades')"><div class="animal-icon">🔵</div><div class="animal-name">Manx</div></div>
-          <div class="animal-card" onclick="go('Norwegian Forest Cat: origem e curiosidades')"><div class="animal-icon">❄️</div><div class="animal-name">Norwegian Forest</div></div>
-          <div class="animal-card" onclick="go('Ocicat: características e temperamento')"><div class="animal-icon">🐆</div><div class="animal-name">Ocicat</div></div>
-          <div class="animal-card" onclick="go('Características do gato Persa')"><div class="animal-icon">👑</div><div class="animal-name">Persa</div></div>
-          <div class="animal-card" onclick="go('Ragdoll: temperamento e curiosidades')"><div class="animal-icon">🎀</div><div class="animal-name">Ragdoll</div></div>
-          <div class="animal-card" onclick="go('Scottish Fold: características e cuidados')"><div class="animal-icon">🎧</div><div class="animal-name">Scottish Fold</div></div>
-          <div class="animal-card" onclick="go('Características do gato Siamês')"><div class="animal-icon">🐾</div><div class="animal-name">Siamês</div></div>
-          <div class="animal-card" onclick="go('Sphynx: cuidados e características')"><div class="animal-icon">🌙</div><div class="animal-name">Sphynx</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- COELHOS & LEBRES -->
-    <div class="accordion-item">
-      <div class="accordion-header" onclick="toggleAccordion('coelhos')">
-        <div class="accordion-title">
-          <span class="accordion-icon">🐇</span>
-          <span>Coelhos & Lebres</span>
-          <span class="accordion-badge">17 raças</span>
-        </div>
-        <span class="accordion-arrow" id="arrow-coelhos">▼</span>
-      </div>
-      <div class="accordion-panel" id="panel-coelhos">
-        <div class="animal-grid">
-          <div class="animal-card" onclick="go('Coelho Angorá: características, pelos e cuidados')"><div class="animal-icon">🤍</div><div class="animal-name">Angorá</div></div>
-          <div class="animal-card" onclick="go('Coelho Californian: características e cuidados')"><div class="animal-icon">☀️</div><div class="animal-name">Californian</div></div>
-          <div class="animal-card" onclick="go('Coelho Dutch: características e origem')"><div class="animal-icon">🎨</div><div class="animal-name">Dutch</div></div>
-          <div class="animal-card" onclick="go('Coelho English Spot: características e curiosidades')"><div class="animal-icon">⚪</div><div class="animal-name">English Spot</div></div>
-          <div class="animal-card" onclick="go('Coelho Flemish Giant: o gigante das raças')"><div class="animal-icon">🐘</div><div class="animal-name">Flemish Giant</div></div>
-          <div class="animal-card" onclick="go('Coelho Harlequin: características e cores')"><div class="animal-icon">🎭</div><div class="animal-name">Harlequin</div></div>
-          <div class="animal-card" onclick="go('Características e temperamento do coelho Holland Lop')"><div class="animal-icon">🐇</div><div class="animal-name">Holland Lop</div></div>
-          <div class="animal-card" onclick="go('Lebre Belga: origem e características')"><div class="animal-icon">🇧🇪</div><div class="animal-name">Lebre Belga</div></div>
-          <div class="animal-card" onclick="go('Lebre Europeia: características, habitat e comportamento')"><div class="animal-icon">🌾</div><div class="animal-name">Lebre Europeia</div></div>
-          <div class="animal-card" onclick="go('Coelho Lionhead: origem e características')"><div class="animal-icon">🦁</div><div class="animal-name">Lionhead</div></div>
-          <div class="animal-card" onclick="go('Coelho Mini Lop: características e cuidados')"><div class="animal-icon">🍎</div><div class="animal-name">Mini Lop</div></div>
-          <div class="animal-card" onclick="go('Como é o coelho Mini Rex?')"><div class="animal-icon">🐾</div><div class="animal-name">Mini Rex</div></div>
-          <div class="animal-card" onclick="go('Coelho New Zealand: características e temperamento')"><div class="animal-icon">🌿</div><div class="animal-name">New Zealand</div></div>
-          <div class="animal-card" onclick="go('Coelho Polish: características e temperamento')"><div class="animal-icon">🌟</div><div class="animal-name">Polish</div></div>
-          <div class="animal-card" onclick="go('Pronolagus: origem e características')"><div class="animal-icon">🐰</div><div class="animal-name">Pronolagus</div></div>
-          <div class="animal-card" onclick="go('Como é o coelho Rex? Temperamento e cuidados')"><div class="animal-icon">🐰</div><div class="animal-name">Rex</div></div>
-          <div class="animal-card" onclick="go('Coelho Satin: características e cuidados')"><div class="animal-icon">✨</div><div class="animal-name">Satin</div></div>
-          <div class="animal-card" onclick="go('Coelho Silver: características e curiosidades')"><div class="animal-icon">🌙</div><div class="animal-name">Silver</div></div>
-          <div class="animal-card" onclick="go('Coelho Tan: características e cuidados')"><div class="animal-icon">🔥</div><div class="animal-name">Tan</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Abissínio: características e temperamento','abissínio')"><div class="animal-icon">🏺</div><div class="animal-name">Abissínio</div></div>
+          <div class="animal-card" onclick="abrirAnimal('American Shorthair: características','american shorthair')"><div class="animal-icon">🇺🇸</div><div class="animal-name">American Shorthair</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Angorá Turco: características e cuidados','angorá turco')"><div class="animal-icon">✨</div><div class="animal-name">Angorá Turco</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Gato Bengal: aparência e comportamento','bengal')"><div class="animal-icon">🐆</div><div class="animal-name">Bengal</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Birman: características e origem','birman')"><div class="animal-icon">🌸</div><div class="animal-name">Birman</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Bombay: o gato pantera preto','bombay')"><div class="animal-icon">🖤</div><div class="animal-name">Bombay</div></div>
+          <div class="animal-card" onclick="abrirAnimal('British Shorthair: características e personalidade','british shorthair')"><div class="animal-icon">🇬🇧</div><div class="animal-name">British Shorthair</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Burmese: características e temperamento','burmese')"><div class="animal-icon">🌺</div><div class="animal-name">Burmese</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cornish Rex: características e curiosidades','cornish rex')"><div class="animal-icon">🌀</div><div class="animal-name">Cornish Rex</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Devon Rex: características e personalidade','devon rex')"><div class="animal-icon">👽</div><div class="animal-name">Devon Rex</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Exotic Shorthair: características e cuidados','exotic shorthair')"><div class="animal-icon">🍊</div><div class="animal-name">Exotic Shorthair</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Como é o gato Maine Coon?','maine coon')"><div class="animal-icon">🦁</div><div class="animal-name">Maine Coon</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Manx: o gato sem cauda','manx')"><div class="animal-icon">🔵</div><div class="animal-name">Manx</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Norwegian Forest Cat: origem e curiosidades','norwegian forest')"><div class="animal-icon">❄️</div><div class="animal-name">Norwegian Forest</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Ocicat: características e temperamento','ocicat')"><div class="animal-icon">🐆</div><div class="animal-name">Ocicat</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do gato Persa','persa')"><div class="animal-icon">👑</div><div class="animal-name">Persa</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Ragdoll: temperamento e curiosidades','ragdoll')"><div class="animal-icon">🎀</div><div class="animal-name">Ragdoll</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Scottish Fold: características e cuidados','scottish fold')"><div class="animal-icon">🎧</div><div class="animal-name">Scottish Fold</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Características do gato Siamês','siamês')"><div class="animal-icon">🐾</div><div class="animal-name">Siamês</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Sphynx: cuidados e características','sphynx')"><div class="animal-icon">🌙</div><div class="animal-name">Sphynx</div></div>
         </div>
       </div>
     </div>
@@ -193,26 +227,59 @@
       </div>
       <div class="accordion-panel" id="panel-cavalos">
         <div class="animal-grid">
-          <div class="animal-card" onclick="go('Cavalo Árabe: características, origem e elegância')"><div class="animal-icon">🌙</div><div class="animal-name">Árabe</div></div>
-          <div class="animal-card" onclick="go('Appaloosa: o cavalo das manchas, características e origem')"><div class="animal-icon">🎨</div><div class="animal-name">Appaloosa</div></div>
-          <div class="animal-card" onclick="go('Cavalo Andaluz: características e elegância espanhola')"><div class="animal-icon">💃</div><div class="animal-name">Andaluz</div></div>
-          <div class="animal-card" onclick="go('Campolina: raça brasileira, características e marcha')"><div class="animal-icon">🇧🇷</div><div class="animal-name">Campolina</div></div>
-          <div class="animal-card" onclick="go('Cavalo Clydesdale: o gigante escocês, características')"><div class="animal-icon">🏴󠁧󠁢󠁳󠁣󠁴󠁿</div><div class="animal-name">Clydesdale</div></div>
-          <div class="animal-card" onclick="go('Cavalo Frísio: o elegante cavalo preto, características')"><div class="animal-icon">🖤</div><div class="animal-name">Frísio</div></div>
-          <div class="animal-card" onclick="go('Cavalo Lusitano: origem portuguesa e características')"><div class="animal-icon">🇵🇹</div><div class="animal-name">Lusitano</div></div>
-          <div class="animal-card" onclick="go('Mangalarga Marchador: o cavalo nacional brasileiro')"><div class="animal-icon">⭐</div><div class="animal-name">Mangalarga</div></div>
-          <div class="animal-card" onclick="go('Mustang: o cavalo selvagem americano, história e curiosidades')"><div class="animal-icon">🌵</div><div class="animal-name">Mustang</div></div>
-          <div class="animal-card" onclick="go('Paint Horse: características e pelagem colorida')"><div class="animal-icon">🎭</div><div class="animal-name">Paint Horse</div></div>
-          <div class="animal-card" onclick="go('Pônei Shetland: o menor pônei, características e cuidados')"><div class="animal-icon">🐾</div><div class="animal-name">Pônei Shetland</div></div>
-          <div class="animal-card" onclick="go('Puro Sangue Inglês: o cavalo mais rápido do mundo')"><div class="animal-icon">🏆</div><div class="animal-name">Puro Sangue</div></div>
-          <div class="animal-card" onclick="go('Quarto de Milha: o cavalo mais popular do mundo, características')"><div class="animal-icon">💨</div><div class="animal-name">Quarto de Milha</div></div>
-          <div class="animal-card" onclick="go('Cavalo Shire: o maior cavalo do mundo, características')"><div class="animal-icon">🦣</div><div class="animal-name">Shire</div></div>
-          <div class="animal-card" onclick="go('Quanto tempo vivem os cavalos? Curiosidades sobre longevidade')"><div class="animal-icon">⏳</div><div class="animal-name">Longevidade</div></div>
-          <div class="animal-card" onclick="go('O que cavalos comem? Alimentação e nutrição equina')"><div class="animal-icon">🌾</div><div class="animal-name">Alimentação</div></div>
-          <div class="animal-card" onclick="go('Como cavalos se comunicam? Comportamento e linguagem equina')"><div class="animal-icon">🗣️</div><div class="animal-name">Comportamento</div></div>
-          <div class="animal-card" onclick="go('Cavalos selvagens: habitat natural e espécies selvagens')"><div class="animal-icon">🌿</div><div class="animal-name">Selvagens</div></div>
-          <div class="animal-card" onclick="go('Curiosidades incríveis sobre cavalos que você não sabia')"><div class="animal-icon">🤩</div><div class="animal-name">Curiosidades</div></div>
-          <div class="animal-card" onclick="go('Cuidados essenciais com cavalos: saúde, ferradura e higiene')"><div class="animal-icon">🧴</div><div class="animal-name">Cuidados</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cavalo Árabe: características, origem e elegância','cavalo árabe')"><div class="animal-icon">🌙</div><div class="animal-name">Árabe</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Appaloosa: o cavalo das manchas','appaloosa')"><div class="animal-icon">🎨</div><div class="animal-name">Appaloosa</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cavalo Andaluz: características e elegância','andaluz')"><div class="animal-icon">💃</div><div class="animal-name">Andaluz</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Campolina: raça brasileira e marcha','campolina')"><div class="animal-icon">🇧🇷</div><div class="animal-name">Campolina</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Clydesdale: o gigante escocês','clydesdale')"><div class="animal-icon">🏴󠁧󠁢󠁳󠁣󠁴󠁿</div><div class="animal-name">Clydesdale</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cavalo Frísio: o elegante cavalo preto','frísio')"><div class="animal-icon">🖤</div><div class="animal-name">Frísio</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cavalo Lusitano: origem portuguesa','lusitano')"><div class="animal-icon">🇵🇹</div><div class="animal-name">Lusitano</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Mangalarga Marchador: o cavalo nacional','mangalarga marchador')"><div class="animal-icon">⭐</div><div class="animal-name">Mangalarga</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Mustang: o cavalo selvagem americano','mustang')"><div class="animal-icon">🌵</div><div class="animal-name">Mustang</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Paint Horse: características e pelagem colorida','paint horse')"><div class="animal-icon">🎭</div><div class="animal-name">Paint Horse</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Pônei Shetland: o menor pônei','shetland')"><div class="animal-icon">🐾</div><div class="animal-name">Pônei Shetland</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Puro Sangue Inglês: o cavalo mais rápido','puro sangue inglês')"><div class="animal-icon">🏆</div><div class="animal-name">Puro Sangue</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Quarto de Milha: o cavalo mais popular do mundo','quarto de milha')"><div class="animal-icon">💨</div><div class="animal-name">Quarto de Milha</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cavalo Shire: o maior cavalo do mundo','shire')"><div class="animal-icon">🦣</div><div class="animal-name">Shire</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Quanto tempo vivem os cavalos?','cavalo')"><div class="animal-icon">⏳</div><div class="animal-name">Longevidade</div></div>
+          <div class="animal-card" onclick="abrirAnimal('O que cavalos comem? Alimentação equina','cavalo')"><div class="animal-icon">🌾</div><div class="animal-name">Alimentação</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Como cavalos se comunicam? Linguagem equina','cavalo')"><div class="animal-icon">🗣️</div><div class="animal-name">Comportamento</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cavalos selvagens: habitat e espécies','mustang')"><div class="animal-icon">🌿</div><div class="animal-name">Selvagens</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Curiosidades incríveis sobre cavalos','cavalo')"><div class="animal-icon">🤩</div><div class="animal-name">Curiosidades</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Cuidados essenciais com cavalos','cavalo')"><div class="animal-icon">🧴</div><div class="animal-name">Cuidados</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COELHOS & LEBRES -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion('coelhos')">
+        <div class="accordion-title">
+          <span class="accordion-icon">🐇</span>
+          <span>Coelhos & Lebres</span>
+          <span class="accordion-badge">17 raças</span>
+        </div>
+        <span class="accordion-arrow" id="arrow-coelhos">▼</span>
+      </div>
+      <div class="accordion-panel" id="panel-coelhos">
+        <div class="animal-grid">
+          <div class="animal-card" onclick="abrirAnimal('Coelho Angorá: pelos e cuidados','angorá')"><div class="animal-icon">🤍</div><div class="animal-name">Angorá</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Californian: características','californian')"><div class="animal-icon">☀️</div><div class="animal-name">Californian</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Dutch: características e origem','dutch')"><div class="animal-icon">🎨</div><div class="animal-name">Dutch</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Flemish Giant: o gigante das raças','flemish giant')"><div class="animal-icon">🐘</div><div class="animal-name">Flemish Giant</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Harlequin: características e cores','harlequin')"><div class="animal-icon">🎭</div><div class="animal-name">Harlequin</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Holland Lop: temperamento','holland lop')"><div class="animal-icon">🐇</div><div class="animal-name">Holland Lop</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Lebre Belga: origem e características','lebre belga')"><div class="animal-icon">🇧🇪</div><div class="animal-name">Lebre Belga</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Lebre Europeia: características e habitat','lebre europeia')"><div class="animal-icon">🌾</div><div class="animal-name">Lebre Europeia</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Lionhead: origem e características','lionhead')"><div class="animal-icon">🦁</div><div class="animal-name">Lionhead</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Mini Lop: características','mini lop')"><div class="animal-icon">🍎</div><div class="animal-name">Mini Lop</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Como é o coelho Mini Rex?','mini rex')"><div class="animal-icon">🐾</div><div class="animal-name">Mini Rex</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho New Zealand: características','new zealand')"><div class="animal-icon">🌿</div><div class="animal-name">New Zealand</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Polish: características','polish')"><div class="animal-icon">🌟</div><div class="animal-name">Polish</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Pronolagus: origem e características','pronolagus')"><div class="animal-icon">🐰</div><div class="animal-name">Pronolagus</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Como é o coelho Rex?','rex')"><div class="animal-icon">🐰</div><div class="animal-name">Rex</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Satin: características','satin')"><div class="animal-icon">✨</div><div class="animal-name">Satin</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Coelho Fuzzy Lop: características','fuzzy lop')"><div class="animal-icon">🐾</div><div class="animal-name">Fuzzy Lop</div></div>
         </div>
       </div>
     </div>
@@ -229,30 +296,11 @@
       </div>
       <div class="accordion-panel" id="panel-capivaras">
         <div class="animal-grid">
-          <div class="animal-card" onclick="go('O que capivaras comem na natureza e em cativeiro?')"><div class="animal-icon">🍃</div><div class="animal-name">Alimentação</div></div>
-          <div class="animal-card" onclick="go('Por que capivaras são tão calmas e sociáveis?')"><div class="animal-icon">😌</div><div class="animal-name">Comportamento</div></div>
-          <div class="animal-card" onclick="go('Capivara é o maior roedor do mundo? Curiosidades')"><div class="animal-icon">🏆</div><div class="animal-name">Curiosidades</div></div>
-          <div class="animal-card" onclick="go('Capivara doméstica: como criar, alimentação e cuidados')"><div class="animal-icon">🏠</div><div class="animal-name">Doméstica</div></div>
-          <div class="animal-card" onclick="go('Capivara selvagem: habitat, comportamento e curiosidades')"><div class="animal-icon">🌊</div><div class="animal-name">Selvagem</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- HAMSTERS -->
-    <div class="accordion-item">
-      <div class="accordion-header" onclick="toggleAccordion('hamsters')">
-        <div class="accordion-title">
-          <span class="accordion-icon">🐹</span>
-          <span>Hamsters</span>
-          <span class="accordion-badge">3 espécies</span>
-        </div>
-        <span class="accordion-arrow" id="arrow-hamsters">▼</span>
-      </div>
-      <div class="accordion-panel" id="panel-hamsters">
-        <div class="animal-grid">
-          <div class="animal-card" onclick="go('Hamster Anão Russo: características, cuidados e temperamento')"><div class="animal-icon">❄️</div><div class="animal-name">Anão Russo</div></div>
-          <div class="animal-card" onclick="go('Hamster Roborovski: o menor e mais rápido dos hamsters')"><div class="animal-icon">⚡</div><div class="animal-name">Roborovski</div></div>
-          <div class="animal-card" onclick="go('Hamster Sírio: características, cuidados e comportamento')"><div class="animal-icon">🐹</div><div class="animal-name">Sírio</div></div>
+          <div class="animal-card" onclick="abrirAnimal('O que capivaras comem?','capivara')"><div class="animal-icon">🍃</div><div class="animal-name">Alimentação</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Por que capivaras são tão calmas?','capivara')"><div class="animal-icon">😌</div><div class="animal-name">Comportamento</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Capivara é o maior roedor do mundo?','capivara')"><div class="animal-icon">🏆</div><div class="animal-name">Curiosidades</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Capivara doméstica: como criar','capivara doméstica')"><div class="animal-icon">🏠</div><div class="animal-name">Doméstica</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Capivara selvagem: habitat e comportamento','capivara selvagem')"><div class="animal-icon">🌊</div><div class="animal-name">Selvagem</div></div>
         </div>
       </div>
     </div>
@@ -269,9 +317,9 @@
       </div>
       <div class="accordion-panel" id="panel-repteis">
         <div class="animal-grid">
-          <div class="animal-card" onclick="go('Dragão Barbudo: características, cuidados e alimentação')"><div class="animal-icon">🔥</div><div class="animal-name">Dragão Barbudo</div></div>
-          <div class="animal-card" onclick="go('Gecko Leopardo: características, cuidados e habitat')"><div class="animal-icon">🌙</div><div class="animal-name">Gecko Leopardo</div></div>
-          <div class="animal-card" onclick="go('Iguana: características, cuidados e alimentação')"><div class="animal-icon">🌿</div><div class="animal-name">Iguana</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Dragão Barbudo: características, cuidados e alimentação','dragão barbudo')"><div class="animal-icon">🐉</div><div class="animal-name">Dragão Barbudo</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Gecko Leopardo: características e cuidados','gecko leopardo')"><div class="animal-icon">🌙</div><div class="animal-name">Gecko Leopardo</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Iguana: características, cuidados e alimentação','iguana')"><div class="animal-icon">🌿</div><div class="animal-name">Iguana</div></div>
         </div>
       </div>
     </div>
@@ -288,9 +336,9 @@
       </div>
       <div class="accordion-panel" id="panel-aves">
         <div class="animal-grid">
-          <div class="animal-card" onclick="go('Arara Azul: características, habitat e curiosidades')"><div class="animal-icon">💙</div><div class="animal-name">Arara Azul</div></div>
-          <div class="animal-card" onclick="go('Calopsita: características, cuidados e comportamento')"><div class="animal-icon">💛</div><div class="animal-name">Calopsita</div></div>
-          <div class="animal-card" onclick="go('Periquito: características, cuidados e alimentação')"><div class="animal-icon">💚</div><div class="animal-name">Periquito</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Arara Azul: características, habitat e curiosidades','arara azul')"><div class="animal-icon">💙</div><div class="animal-name">Arara Azul</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Calopsita: características, cuidados e comportamento','calopsita')"><div class="animal-icon">💛</div><div class="animal-name">Calopsita</div></div>
+          <div class="animal-card" onclick="abrirAnimal('Periquito: características, cuidados e alimentação','periquito')"><div class="animal-icon">💚</div><div class="animal-name">Periquito</div></div>
         </div>
       </div>
     </div>
