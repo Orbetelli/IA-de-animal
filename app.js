@@ -386,8 +386,7 @@ async function calcularRacao() {
       })
     });
     const data = await res.json();
-    // FIX: usar innerHTML apenas para quebras de linha — o texto vem da nossa própria API
-    res_div.innerHTML = escapeHtml(data.texto).replace(/\n/g, '<br>');
+    res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
   } catch { res_div.textContent = 'Erro ao calcular. Tente novamente.'; }
 }
 
@@ -409,7 +408,7 @@ async function gerarGuiaVacina() {
       })
     });
     const data = await res.json();
-    res_div.innerHTML = escapeHtml(data.texto).replace(/\n/g, '<br>');
+    res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
   } catch { res_div.textContent = 'Erro ao gerar guia. Tente novamente.'; }
 }
 
