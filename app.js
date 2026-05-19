@@ -412,6 +412,49 @@ async function gerarGuiaVacina() {
   } catch { res_div.textContent = 'Erro ao gerar guia. Tente novamente.'; }
 }
 
+// ===== EXPECTATIVA DE VIDA =====
+async function calcularVida() {
+  const especie = document.getElementById('vida-especie').value;
+  const raca    = document.getElementById('vida-raca').value.trim();
+  const idade   = document.getElementById('vida-idade').value.trim();
+  const res_div = document.getElementById('vida-resultado');
+  if (!idade) { res_div.textContent = 'Informe a idade atual do animal!'; res_div.classList.add('show'); return; }
+  res_div.innerHTML = '🐾 Calculando...'; res_div.classList.add('show');
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        pergunta: `Expectativa de vida para: espécie:${especie}, raça:${raca || 'não informada'}, idade atual:${idade}. Responda com: 1) expectativa de vida média da raça/espécie em anos, 2) fase de vida atual (filhote, jovem, adulto, meia-idade, sênior, geriátrico) com faixa etária de cada fase, 3) quanto tempo estimado de vida ainda tem pela frente, 4) cuidados essenciais e mudanças recomendadas para a fase atual. Use emojis e seja caloroso e encorajador.`,
+        tema: 'saúde',
+        historico: []
+      })
+    });
+    const data = await res.json();
+    res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
+  } catch { res_div.textContent = 'Erro ao calcular. Tente novamente.'; }
+}
+
+// ===== PODE COMER? =====
+async function verificarAlimento() {
+  const especie  = document.getElementById('comer-especie').value;
+  const alimento = document.getElementById('comer-alimento').value.trim();
+  const res_div  = document.getElementById('comer-resultado');
+  if (!alimento) { res_div.textContent = 'Informe o alimento!'; res_div.classList.add('show'); return; }
+  res_div.innerHTML = '🔍 Verificando...'; res_div.classList.add('show');
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        pergunta: `${especie} pode comer "${alimento}"? Responda com: 1) veredicto claro iniciando com ✅ SEGURO, ⚠️ COM MODERAÇÃO ou 🚫 TÓXICO/PERIGOSO em negrito, 2) explicação do motivo em 2-3 frases, 3) se tóxico: sintomas de intoxicação e o que fazer em caso de ingestão, 4) se seguro: quantidade recomendada e forma de preparo ideal. Seja direto e prático.`,
+        tema: 'alimentação',
+        historico: []
+      })
+    });
+    const data = await res.json();
+    res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
+  } catch { res_div.textContent = 'Erro ao verificar. Tente novamente.'; }
+}
+
 // ===== CALENDÁRIO =====
 // PERF #2: gera e cacheia o HTML do calendário uma única vez por sessão
 function abrirCalendario() {
@@ -531,7 +574,7 @@ async function ask() {
     </div>`;
 
   const temaFinal = modoVet
-    ? 'Responda como veterinário especialista. Seja técnico, preciso e sempre recomende consulta presencial.'
+    ? 'Responda como veterinário clínico especialista. Use terminologia técnica e nomenclatura científica quando relevante. Apresente possíveis causas, diagnóstico diferencial e quando o caso é urgência ou emergência. Indique claramente se o sintoma exige atendimento imediato. Seja preciso, objetivo e sempre recomende consulta presencial com médico veterinário.'
     : (tema ? `Foque especialmente em ${tema}.` : '');
 
   // FIX: historico conversacional real enviado ao backend

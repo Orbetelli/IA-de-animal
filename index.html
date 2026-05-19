@@ -15,13 +15,13 @@
     <div style="font-size:48px;margin-bottom:1rem">🐾</div>
     <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:.4rem;color:#F0EDE6">Bem-vindo ao <em>BicharIA</em></h2>
     <p style="font-size:14px;color:#8B949E;margin-bottom:1.5rem">Sua IA especialista no mundo animal</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem">
       <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>🤖</span><span>IA especialista em centenas de animais</span></div>
       <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>⚡</span><span>Comparador entre raças e espécies</span></div>
       <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>🩺</span><span>Modo veterinário para dúvidas de saúde</span></div>
       <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>🍖</span><span>Calculadora de ração personalizada</span></div>
-      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>💉</span><span>Guia de vacinação por espécie</span></div>
-      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>❤️</span><span>Salve seus animais favoritos</span></div>
+      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>⏳</span><span>Expectativa de vida por raça e idade</span></div>
+      <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>🍽️</span><span>Meu pet pode comer isso?</span></div>
     </div>
     <button id="btn-onboarding-ok" style="width:100%;padding:14px;background:#F5A623;color:#0D1117;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Explorar agora 🐾</button>
   </div>
@@ -216,6 +216,76 @@
         </div>
         <button class="tool-submit" onclick="gerarGuiaVacina()">Gerar guia 💉</button>
         <div id="vacina-resultado" class="tool-resultado"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPECTATIVA DE VIDA — SEÇÃO FIXA -->
+  <div class="section-card">
+    <div class="section-card-header" onclick="toggleSection('vida')">
+      <span>⏳ Expectativa de Vida</span>
+      <span id="arrow-vida" class="section-arrow">▼</span>
+    </div>
+    <div id="panel-vida" class="section-panel">
+      <div class="tool-form">
+        <div class="tool-row">
+          <div class="tool-field">
+            <label>Espécie</label>
+            <select id="vida-especie">
+              <option value="cão">🐕 Cão</option>
+              <option value="gato">🐱 Gato</option>
+              <option value="coelho">🐇 Coelho</option>
+              <option value="cavalo">🐴 Cavalo</option>
+              <option value="hamster">🐹 Hamster</option>
+              <option value="papagaio">🦜 Papagaio</option>
+              <option value="tartaruga">🐢 Tartaruga</option>
+            </select>
+          </div>
+          <div class="tool-field">
+            <label>Idade atual</label>
+            <input type="text" id="vida-idade" placeholder="Ex: 5 anos">
+          </div>
+        </div>
+        <div class="tool-row">
+          <div class="tool-field">
+            <label>Raça (opcional)</label>
+            <input type="text" id="vida-raca" placeholder="Ex: Labrador">
+          </div>
+        </div>
+        <button class="tool-submit" onclick="calcularVida()">Calcular ⏳</button>
+        <div id="vida-resultado" class="tool-resultado"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PODE COMER? — SEÇÃO FIXA -->
+  <div class="section-card">
+    <div class="section-card-header" onclick="toggleSection('comer')">
+      <span>🍽️ Meu pet pode comer isso?</span>
+      <span id="arrow-comer" class="section-arrow">▼</span>
+    </div>
+    <div id="panel-comer" class="section-panel">
+      <div class="tool-form">
+        <div class="tool-row">
+          <div class="tool-field">
+            <label>Espécie</label>
+            <select id="comer-especie">
+              <option value="cão">🐕 Cão</option>
+              <option value="gato">🐱 Gato</option>
+              <option value="coelho">🐇 Coelho</option>
+              <option value="cavalo">🐴 Cavalo</option>
+              <option value="hamster">🐹 Hamster</option>
+              <option value="papagaio">🦜 Papagaio</option>
+              <option value="tartaruga">🐢 Tartaruga</option>
+            </select>
+          </div>
+          <div class="tool-field">
+            <label>Alimento</label>
+            <input type="text" id="comer-alimento" placeholder="Ex: abacate, chocolate...">
+          </div>
+        </div>
+        <button class="tool-submit" onclick="verificarAlimento()">Verificar 🍽️</button>
+        <div id="comer-resultado" class="tool-resultado"></div>
       </div>
     </div>
   </div>
