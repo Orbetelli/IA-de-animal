@@ -64,7 +64,10 @@ const LOADING_MSGS = [
 // ===== STATE =====
 let tema = '';
 let modoVet = false;
-let historico = JSON.parse(localStorage.getItem('bicharIA-historico') || '[]');
+// historicoSidebar: strings das perguntas recentes (exibidas no sidebar)
+let historicoSidebar = JSON.parse(localStorage.getItem('bicharIA-historico') || '[]');
+// historicoConversa: array {role, content} enviado ao backend para contexto conversacional
+let historicoConversa = [];
 let favoritos = JSON.parse(localStorage.getItem('bicharIA-favoritos') || '[]');
 
 // Cache de respostas indexado por pergunta
@@ -178,13 +181,14 @@ function toggleSection(id) {
 
 // ===== HISTÓRICO =====
 function salvarHistorico(pergunta) {
-  historico = [pergunta, ...historico.filter(h => h !== pergunta)].slice(0, 6);
-  localStorage.setItem('bicharIA-historico', JSON.stringify(historico));
+  historicoSidebar = [pergunta, ...historicoSidebar.filter(h => h !== pergunta)].slice(0, 6);
+  localStorage.setItem('bicharIA-historico', JSON.stringify(historicoSidebar));
   renderHistorico();
 }
 
 function limparHistorico() {
-  historico = [];
+  historicoSidebar = [];
+  historicoConversa = [];
   localStorage.removeItem('bicharIA-historico');
   renderHistorico();
 }
@@ -193,10 +197,10 @@ function renderHistorico() {
   const wrap = document.getElementById('historico-wrap');
   const lista = document.getElementById('historico-lista');
   if (!wrap || !lista) return;
-  if (historico.length === 0) { wrap.style.display = 'none'; return; }
+  if (historicoSidebar.length === 0) { wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
 
-  lista.innerHTML = historico.map(h => {
+  lista.innerHTML = historicoSidebar.map(h => {
     const label = h.length > 40 ? h.slice(0, 40) + '…' : h;
     return `<span class="hist-pill" data-pergunta="${h.replace(/"/g,'&quot;')}">🕐 ${label}</span>`;
   }).join('');
@@ -285,6 +289,17 @@ function abrirComparador() {
 }
 
 let compSelecionados = [];
+let _compEmAndamento = false; // FIX: guard contra duplo clique
+
+// Escapa strings para inserção segura em HTML (FIX: XSS no comparador)
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 function renderCompSelecao() {
   const animais = ['Golden Retriever','Husky Siberiano','Bulldog Francês','Shiba Inu','Border Collie',
@@ -321,8 +336,10 @@ function selecionarComp(nome) {
 }
 
 async function executarComp() {
+  if (_compEmAndamento) return; // FIX: guard contra duplo clique
+  _compEmAndamento = true;
   const [a, b] = compSelecionados;
-  document.getElementById('comparador-area').innerHTML = `<div style="color:var(--muted);font-size:14px;padding:1rem 0">⚡ Comparando ${a} vs ${b}...</div>`;
+  document.getElementById('comparador-area').innerHTML = `<div style="color:var(--muted);font-size:14px;padding:1rem 0">⚡ Comparando ${escapeHtml(a)} vs ${escapeHtml(b)}...</div>`;
   try {
     const res = await fetch('/api/chat', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -334,15 +351,18 @@ async function executarComp() {
     });
     const data = await res.json();
     const comp = JSON.parse(data.texto.replace(/```json|```/g, '').trim());
+    // FIX: escapa todos os valores do JSON antes de inserir em innerHTML
     document.getElementById('comparador-area').innerHTML = `
-      <div class="comp-header"><span class="comp-nome">${comp.animal1}</span><span style="color:var(--muted);font-size:12px">VS</span><span class="comp-nome">${comp.animal2}</span></div>
-      <div class="comp-tabela">${comp.categorias.map(c => `<div class="comp-row"><span class="comp-val">${c.valor1}</span><span class="comp-label">${c.nome}</span><span class="comp-val">${c.valor2}</span></div>`).join('')}</div>
-      <div class="comp-veredito">💡 ${comp.veredito}</div>
+      <div class="comp-header"><span class="comp-nome">${escapeHtml(comp.animal1)}</span><span style="color:var(--muted);font-size:12px">VS</span><span class="comp-nome">${escapeHtml(comp.animal2)}</span></div>
+      <div class="comp-tabela">${comp.categorias.map(c => `<div class="comp-row"><span class="comp-val">${escapeHtml(c.valor1)}</span><span class="comp-label">${escapeHtml(c.nome)}</span><span class="comp-val">${escapeHtml(c.valor2)}</span></div>`).join('')}</div>
+      <div class="comp-veredito">💡 ${escapeHtml(comp.veredito)}</div>
       <button class="simple-btn-outline" id="btn-nova-comp" style="margin-top:.75rem">↩ Nova comparação</button>
     `;
     document.getElementById('btn-nova-comp').addEventListener('click', renderCompSelecao);
   } catch (e) {
     document.getElementById('comparador-area').innerHTML = '<div style="color:var(--accent2);font-size:14px">Erro ao comparar. Tente novamente.</div>';
+  } finally {
+    _compEmAndamento = false; // FIX: libera guard independente do resultado
   }
 }
 
@@ -366,7 +386,8 @@ async function calcularRacao() {
       })
     });
     const data = await res.json();
-    res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
+    // FIX: usar innerHTML apenas para quebras de linha — o texto vem da nossa própria API
+    res_div.innerHTML = escapeHtml(data.texto).replace(/\n/g, '<br>');
   } catch { res_div.textContent = 'Erro ao calcular. Tente novamente.'; }
 }
 
@@ -388,7 +409,7 @@ async function gerarGuiaVacina() {
       })
     });
     const data = await res.json();
-    res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
+    res_div.innerHTML = escapeHtml(data.texto).replace(/\n/g, '<br>');
   } catch { res_div.textContent = 'Erro ao gerar guia. Tente novamente.'; }
 }
 
@@ -514,13 +535,13 @@ async function ask() {
     ? 'Responda como veterinário especialista. Seja técnico, preciso e sempre recomende consulta presencial.'
     : (tema ? `Foque especialmente em ${tema}.` : '');
 
-  // FIX #2: historico enviado ao backend (array vazio por ora — extensível para histórico real)
+  // FIX: historico conversacional real enviado ao backend
   const [photoUrl, backendRes] = await Promise.allSettled([
     fetchAnimalPhoto(q),
     fetch('/api/chat', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ pergunta: q, tema: temaFinal, historico: [] })
+      body: JSON.stringify({ pergunta: q, tema: temaFinal, historico: historicoConversa })
     })
   ]);
 
@@ -535,6 +556,11 @@ async function ask() {
 
     const texto = data.texto || 'Não foi possível obter uma resposta.';
     const foto  = photoUrl.status === 'fulfilled' ? photoUrl.value : null;
+
+    // Atualiza histórico conversacional (mantém últimas 10 trocas = 20 mensagens)
+    historicoConversa.push({ role: 'user', content: q });
+    historicoConversa.push({ role: 'assistant', content: texto });
+    if (historicoConversa.length > 20) historicoConversa = historicoConversa.slice(-20);
 
     // Armazena no cache e mantém fila de chaves para LRU simples (PERF #5)
     respostasCache.set(q, { texto, foto });
@@ -566,8 +592,8 @@ async function ask() {
     card.innerHTML = `<div style="color:#E8825A;font-size:14px">⚠️ Erro: ${err.message}</div>`;
   } finally {
     _askEmAndamento = false; // PERF #3: libera o guard independente do resultado
+    input.value = ''; // FIX: limpa o input sempre, independente de erro
   }
-  input.value = '';
 }
 
 // ===== RIPPLE NOS TOOL BUTTONS =====
@@ -588,8 +614,28 @@ function addRipple(e) {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+  // Carrega historico do sidebar a partir do localStorage
+  historicoSidebar = JSON.parse(localStorage.getItem('bicharIA-historico') || '[]');
   renderHistorico();
   verificarOnboarding();
+
+  // FIX: event listeners dos modais em vez de onclick inline no HTML
+  document.getElementById('btn-onboarding-ok')?.addEventListener('click', fecharOnboarding);
+  document.getElementById('btn-fechar-curiosidade')?.addEventListener('click', () => {
+    document.getElementById('modal-curiosidade').style.display = 'none';
+  });
+  document.getElementById('btn-fechar-favoritos')?.addEventListener('click', () => {
+    document.getElementById('modal-favoritos').style.display = 'none';
+  });
+  document.getElementById('btn-fechar-comparador')?.addEventListener('click', () => {
+    document.getElementById('modal-comparador').style.display = 'none';
+  });
+  document.getElementById('btn-fechar-calendario')?.addEventListener('click', () => {
+    document.getElementById('modal-calendario').style.display = 'none';
+  });
+  document.getElementById('btn-share-copiar')?.addEventListener('click', copiarShareText);
+  document.getElementById('btn-fechar-share')?.addEventListener('click', fecharShare);
+
   // Aplica ripple em todos os tool-btn
   document.querySelectorAll('.tool-btn').forEach(btn => {
     btn.addEventListener('click', addRipple);

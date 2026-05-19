@@ -23,7 +23,7 @@
       <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>💉</span><span>Guia de vacinação por espécie</span></div>
       <div style="background:#0D1117;border:1px solid #2A3040;border-radius:12px;padding:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:#8B949E;text-align:left"><span>❤️</span><span>Salve seus animais favoritos</span></div>
     </div>
-    <button style="width:100%;padding:14px;background:#F5A623;color:#0D1117;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="fecharOnboarding()">Explorar agora 🐾</button>
+    <button id="btn-onboarding-ok" style="width:100%;padding:14px;background:#F5A623;color:#0D1117;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Explorar agora 🐾</button>
   </div>
 </div>
 
@@ -32,7 +32,7 @@
   <div class="simple-box">
     <div class="simple-badge">🌟 Curiosidade do dia</div>
     <div id="curiosidade-texto" class="simple-texto">Carregando...</div>
-    <button class="simple-btn" onclick="document.getElementById('modal-curiosidade').style.display='none'">Entendi! 🐾</button>
+    <button id="btn-fechar-curiosidade" class="simple-btn">Entendi! 🐾</button>
   </div>
 </div>
 
@@ -41,7 +41,7 @@
   <div class="simple-box simple-box--wide">
     <div class="simple-badge">❤️ Meus Favoritos</div>
     <div id="favoritos-lista"></div>
-    <button class="simple-btn-outline" onclick="document.getElementById('modal-favoritos').style.display='none'" style="margin-top:1rem">Fechar</button>
+    <button id="btn-fechar-favoritos" class="simple-btn-outline" style="margin-top:1rem">Fechar</button>
   </div>
 </div>
 
@@ -50,7 +50,7 @@
   <div class="simple-box simple-box--wide">
     <div class="simple-badge">⚡ Comparador de Animais</div>
     <div id="comparador-area"></div>
-    <button class="simple-btn-outline" onclick="document.getElementById('modal-comparador').style.display='none'" style="margin-top:.75rem;width:100%">✕ Fechar</button>
+    <button id="btn-fechar-comparador" class="simple-btn-outline" style="margin-top:.75rem;width:100%">✕ Fechar</button>
   </div>
 </div>
 
@@ -59,7 +59,7 @@
   <div class="simple-box simple-box--wide">
     <div class="simple-badge">📅 Calendário Animal</div>
     <div id="calendario-lista" class="cal-lista"></div>
-    <button class="simple-btn-outline" onclick="document.getElementById('modal-calendario').style.display='none'" style="margin-top:1rem;width:100%">Fechar</button>
+    <button id="btn-fechar-calendario" class="simple-btn-outline" style="margin-top:1rem;width:100%">Fechar</button>
   </div>
 </div>
 
@@ -441,8 +441,8 @@
       <div style="font-size:11px;color:#8B949E;padding:8px 14px;border-top:1px solid #2A3040">bicharIA.vercel.app</div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:.75rem">
-      <button id="btn-share-copiar" class="action-btn" onclick="copiarShareText()" style="flex:1;text-align:center">📋 Copiar texto</button>
-      <button class="action-btn" onclick="fecharShare()" style="flex:1;text-align:center">✕ Fechar</button>
+      <button id="btn-share-copiar" class="action-btn" style="flex:1;text-align:center">📋 Copiar texto</button>
+      <button id="btn-fechar-share" class="action-btn" style="flex:1;text-align:center">✕ Fechar</button>
     </div>
   </div>
 </div>
