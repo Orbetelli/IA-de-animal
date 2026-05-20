@@ -367,14 +367,17 @@ async function executarComp() {
 }
 
 // ===== CALCULADORA =====
+let _calcEmAndamento = false; // FIX: guard contra double-click
 async function calcularRacao() {
+  if (_calcEmAndamento) return;
+  _calcEmAndamento = true;
   const especie  = document.getElementById('calc-especie').value;
   const raca     = document.getElementById('calc-raca').value.trim();
   const peso     = document.getElementById('calc-peso').value.trim();
   const idade    = document.getElementById('calc-idade').value.trim();
   const castrado = document.getElementById('calc-castrado').value;
   const res_div  = document.getElementById('calc-resultado');
-  if (!peso || !idade) { res_div.textContent = 'Preencha peso e idade!'; res_div.classList.add('show'); return; }
+  if (!peso || !idade) { res_div.textContent = 'Preencha peso e idade!'; res_div.classList.add('show'); _calcEmAndamento = false; return; }
   res_div.innerHTML = '🐾 Calculando...'; res_div.classList.add('show');
   try {
     const res = await fetch('/api/chat', {
@@ -388,15 +391,19 @@ async function calcularRacao() {
     const data = await res.json();
     res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
   } catch { res_div.textContent = 'Erro ao calcular. Tente novamente.'; }
+  finally { _calcEmAndamento = false; }
 }
 
 // ===== VACINAÇÃO =====
+let _vacinaEmAndamento = false; // FIX: guard contra double-click
 async function gerarGuiaVacina() {
+  if (_vacinaEmAndamento) return;
+  _vacinaEmAndamento = true;
   const especie = document.getElementById('vacina-especie').value;
   const local   = document.getElementById('vacina-local').value;
   const idade   = document.getElementById('vacina-idade').value.trim();
   const res_div = document.getElementById('vacina-resultado');
-  if (!idade) { res_div.textContent = 'Informe a idade do animal!'; res_div.classList.add('show'); return; }
+  if (!idade) { res_div.textContent = 'Informe a idade do animal!'; res_div.classList.add('show'); _vacinaEmAndamento = false; return; }
   res_div.innerHTML = '💉 Gerando guia...'; res_div.classList.add('show');
   try {
     const res = await fetch('/api/chat', {
@@ -410,15 +417,19 @@ async function gerarGuiaVacina() {
     const data = await res.json();
     res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
   } catch { res_div.textContent = 'Erro ao gerar guia. Tente novamente.'; }
+  finally { _vacinaEmAndamento = false; }
 }
 
 // ===== EXPECTATIVA DE VIDA =====
+let _vidaEmAndamento = false; // FIX: guard contra double-click
 async function calcularVida() {
+  if (_vidaEmAndamento) return;
+  _vidaEmAndamento = true;
   const especie = document.getElementById('vida-especie').value;
   const raca    = document.getElementById('vida-raca').value.trim();
   const idade   = document.getElementById('vida-idade').value.trim();
   const res_div = document.getElementById('vida-resultado');
-  if (!idade) { res_div.textContent = 'Informe a idade atual do animal!'; res_div.classList.add('show'); return; }
+  if (!idade) { res_div.textContent = 'Informe a idade atual do animal!'; res_div.classList.add('show'); _vidaEmAndamento = false; return; }
   res_div.innerHTML = '🐾 Calculando...'; res_div.classList.add('show');
   try {
     const res = await fetch('/api/chat', {
@@ -432,14 +443,20 @@ async function calcularVida() {
     const data = await res.json();
     res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
   } catch { res_div.textContent = 'Erro ao calcular. Tente novamente.'; }
+  finally { _vidaEmAndamento = false; }
 }
 
 // ===== PODE COMER? =====
+let _comerEmAndamento = false; // FIX: guard contra double-click
 async function verificarAlimento() {
+  if (_comerEmAndamento) return;
+  _comerEmAndamento = true;
   const especie  = document.getElementById('comer-especie').value;
-  const alimento = document.getElementById('comer-alimento').value.trim();
+  // FIX: trunca e escapa o alimento para evitar prompt injection
+  const alimentoRaw = document.getElementById('comer-alimento').value.trim();
+  const alimento = alimentoRaw.slice(0, 60).replace(/["""''`\\]/g, '');
   const res_div  = document.getElementById('comer-resultado');
-  if (!alimento) { res_div.textContent = 'Informe o alimento!'; res_div.classList.add('show'); return; }
+  if (!alimento) { res_div.textContent = 'Informe o alimento!'; res_div.classList.add('show'); _comerEmAndamento = false; return; }
   res_div.innerHTML = '🔍 Verificando...'; res_div.classList.add('show');
   try {
     const res = await fetch('/api/chat', {
@@ -453,6 +470,7 @@ async function verificarAlimento() {
     const data = await res.json();
     res_div.innerHTML = data.texto.replace(/\n/g, '<br>');
   } catch { res_div.textContent = 'Erro ao verificar. Tente novamente.'; }
+  finally { _comerEmAndamento = false; }
 }
 
 // ===== CALENDÁRIO =====
@@ -677,6 +695,49 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('btn-share-copiar')?.addEventListener('click', copiarShareText);
   document.getElementById('btn-fechar-share')?.addEventListener('click', fecharShare);
+
+  // FIX: toolbar — migrado de onclick inline
+  document.getElementById('btn-comparar-toolbar')?.addEventListener('click', abrirComparador);
+  document.getElementById('btn-calendario-toolbar')?.addEventListener('click', abrirCalendario);
+  document.getElementById('btn-favoritos-toolbar')?.addEventListener('click', abrirFavoritos);
+
+  // FIX: modo vet — migrado de onchange inline
+  document.getElementById('toggle-vet')?.addEventListener('change', toggleModoVet);
+
+  // FIX: busca — migrado de onkeydown/onclick inline
+  document.getElementById('q')?.addEventListener('keydown', e => { if (e.key === 'Enter') ask(); });
+  document.getElementById('btn-search')?.addEventListener('click', ask);
+
+  // FIX: filtros de tema — migrado de onclick inline, usando data-tema
+  document.querySelectorAll('.tag[data-tema]').forEach(tag => {
+    tag.addEventListener('click', () => setTag(tag, tag.dataset.tema));
+  });
+
+  // FIX: quick pills — migrado de onclick inline, usando data-q
+  document.querySelectorAll('.qpill[data-q]').forEach(pill => {
+    pill.addEventListener('click', () => go(pill.dataset.q));
+  });
+
+  // FIX: section headers (calculadoras) — migrado de onclick inline, usando data-section
+  document.querySelectorAll('.section-card-header[data-section]').forEach(header => {
+    header.addEventListener('click', () => toggleSection(header.dataset.section));
+  });
+
+  // FIX: accordion headers — migrado de onclick inline, usando data-accordion
+  document.querySelectorAll('.accordion-header[data-accordion]').forEach(header => {
+    header.addEventListener('click', () => toggleAccordion(header.dataset.accordion));
+  });
+
+  // FIX: animal cards — migrado de onclick inline, usando data-q
+  document.querySelectorAll('.animal-card[data-q]').forEach(card => {
+    card.addEventListener('click', () => go(card.dataset.q));
+  });
+
+  // FIX: botões submit das ferramentas — migrado de onclick inline
+  document.getElementById('btn-calc-submit')?.addEventListener('click', calcularRacao);
+  document.getElementById('btn-vacina-submit')?.addEventListener('click', gerarGuiaVacina);
+  document.getElementById('btn-vida-submit')?.addEventListener('click', calcularVida);
+  document.getElementById('btn-comer-submit')?.addEventListener('click', verificarAlimento);
 
   // Aplica ripple em todos os tool-btn
   document.querySelectorAll('.tool-btn').forEach(btn => {
