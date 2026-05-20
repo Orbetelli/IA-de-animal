@@ -75,6 +75,18 @@ const respostasCache = new Map();
 // Fila auxiliar de chaves para evitar iterator no Map (PERF #5)
 const respostasCacheKeys = [];
 
+// RATE LIMIT frontend: máximo 15 perguntas por minuto
+const _rlTimestamps = [];
+const RL_MAX = 15;
+const RL_WINDOW_MS = 60_000;
+function _rateLimitOk() {
+  const now = Date.now();
+  while (_rlTimestamps.length && now - _rlTimestamps[0] > RL_WINDOW_MS) _rlTimestamps.shift();
+  if (_rlTimestamps.length >= RL_MAX) return false;
+  _rlTimestamps.push(now);
+  return true;
+}
+
 // PERF #1: Map pré-construído para lookup O(1) em vez de Object.entries O(n)
 const BREED_LOOKUP = new Map(Object.entries(BREED_MAP));
 
@@ -191,6 +203,47 @@ function limparHistorico() {
   historicoConversa = [];
   localStorage.removeItem('bicharIA-historico');
   renderHistorico();
+  renderHistoricoConversa();
+}
+
+// ===== HISTÓRICO CONVERSACIONAL VISÍVEL =====
+// Exibe as trocas da sessão atual abaixo do card de resposta
+function renderHistoricoConversa() {
+  const wrap = document.getElementById('historico-conversa-wrap');
+  if (!wrap) return;
+  if (historicoConversa.length < 2) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  // Mostra todas as trocas exceto a mais recente (que já aparece no card principal)
+  const trocasAnteriores = historicoConversa.slice(0, -2);
+  if (trocasAnteriores.length === 0) { wrap.style.display = 'none'; return; }
+
+  // Agrupa em pares user/assistant
+  const pares = [];
+  for (let i = 0; i < trocasAnteriores.length; i += 2) {
+    if (trocasAnteriores[i] && trocasAnteriores[i + 1]) {
+      pares.push({ user: trocasAnteriores[i].content, assistant: trocasAnteriores[i + 1].content });
+    }
+  }
+
+  const lista = document.getElementById('historico-conversa-lista');
+  lista.innerHTML = pares.map((p, i) => `
+    <div class="hc-item">
+      <div class="hc-pergunta">
+        <span class="hc-icon">🧑</span>
+        <span>${p.user.length > 80 ? p.user.slice(0, 80) + '…' : escapeHtml(p.user)}</span>
+      </div>
+      <div class="hc-resposta">
+        <span class="hc-icon">🐾</span>
+        <span>${p.assistant.slice(0, 120).replace(/\n/g, ' ')}${p.assistant.length > 120 ? '…' : ''}</span>
+      </div>
+      <button class="hc-rever" data-q="${p.user.replace(/"/g, '&quot;')}">↩ Rever</button>
+    </div>
+  `).join('');
+
+  lista.querySelectorAll('.hc-rever').forEach(btn => {
+    btn.addEventListener('click', () => go(btn.dataset.q));
+  });
 }
 
 function renderHistorico() {
@@ -518,29 +571,41 @@ function copiarResposta() {
 
 // ===== FOTO =====
 // PERF #1: usa BREED_LOOKUP (Map) em vez de Object.entries a cada chamada
+// MELHORIA: fallback automático para /api/photo quando a raça não está no BREED_MAP
 async function fetchAnimalPhoto(pergunta) {
   const lower = pergunta.toLowerCase();
   let match = null;
   for (const [nome, info] of BREED_LOOKUP) {
     if (lower.includes(nome)) { match = info; break; }
   }
-  if (!match) return null;
+
   try {
-    if (match.type === 'dog' && match.slug) {
-      const res = await fetch(`https://dog.ceo/api/breed/${match.slug}/images/random`);
-      const data = await res.json();
-      return data.status === 'success' ? data.message : null;
+    if (match) {
+      if (match.type === 'dog' && match.slug) {
+        const res = await fetch(`https://dog.ceo/api/breed/${match.slug}/images/random`);
+        const data = await res.json();
+        return data.status === 'success' ? data.message : null;
+      }
+      if (['cat', 'rabbit', 'capybara', 'other'].includes(match.type)) {
+        const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
+        const data = await res.json();
+        return data.url || null;
+      }
     }
-    if (['cat', 'rabbit', 'capybara', 'other'].includes(match.type)) {
-      const res = await fetch(`/api/photo?query=${encodeURIComponent(match.query)}`);
-      const data = await res.json();
-      return data.url || null;
-    }
+
+    // FALLBACK: extrai até 3 palavras relevantes da pergunta e tenta buscar foto mesmo sem entrada no BREED_MAP
+    const stopWords = new Set(['como','qual','quais','é','são','de','do','da','os','as','um','uma','para','que','por','com','em','características','origem','comportamento','cuidados','curiosidades','raça','espécie','sobre','e','o','a']);
+    const palavras = lower.replace(/[^a-záéíóúãõâêîôûàüçñ\s]/g, '').split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
+    if (palavras.length === 0) return null;
+    const query = palavras.slice(0, 3).join(' ');
+    const res = await fetch(`/api/photo?query=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    return data.url || null;
+
   } catch (err) {
     console.warn('[fetchAnimalPhoto] falhou:', err.message);
     return null;
   }
-  return null;
 }
 
 // ===== COMPARTILHAR =====
@@ -577,11 +642,21 @@ async function ask() {
   const input = document.getElementById('q');
   const q = input.value.trim();
   if (!q) return;
+
+  // RATE LIMIT frontend
+  if (!_rateLimitOk()) {
+    const card = document.getElementById('card');
+    card.className = 'answer-card active';
+    card.innerHTML = `<div style="color:#E8825A;font-size:14px">⏱️ Muitas perguntas em pouco tempo! Aguarde alguns segundos e tente novamente.</div>`;
+    return;
+  }
+
   _askEmAndamento = true;
+  input.value = '';
   salvarHistorico(q);
+
   const card = document.getElementById('card');
   card.className = 'answer-card active';
-  // UX/UI: skeleton loader em vez de 3 pontos simples
   card.innerHTML = `
     <div class="answer-label"><span class="dot"></span> ${randomLoadingMsg()}</div>
     <div class="skeleton-wrap">
@@ -595,64 +670,98 @@ async function ask() {
     ? 'Responda como veterinário clínico especialista. Use terminologia técnica e nomenclatura científica quando relevante. Apresente possíveis causas, diagnóstico diferencial e quando o caso é urgência ou emergência. Indique claramente se o sintoma exige atendimento imediato. Seja preciso, objetivo e sempre recomende consulta presencial com médico veterinário.'
     : (tema ? `Foque especialmente em ${tema}.` : '');
 
-  // FIX: historico conversacional real enviado ao backend
-  const [photoUrl, backendRes] = await Promise.allSettled([
-    fetchAnimalPhoto(q),
-    fetch('/api/chat', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ pergunta: q, tema: temaFinal, historico: historicoConversa })
-    })
-  ]);
+  // Busca foto em paralelo enquanto o stream começa
+  const photoPromise = fetchAnimalPhoto(q);
 
   try {
-    // FIX #1: verificação explícita de Promise rejeitada antes de acessar .value
-    if (backendRes.status === 'rejected') {
-      throw new Error('Falha na conexão com o servidor. Tente novamente.');
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pergunta: q, tema: temaFinal, historico: historicoConversa, stream: true })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: `Erro ${response.status}` }));
+      throw new Error(err.error || `Erro ${response.status}`);
     }
 
-    const data = await backendRes.value.json();
-    if (data.error) throw new Error(data.error);
-
-    const texto = data.texto || 'Não foi possível obter uma resposta.';
-    const foto  = photoUrl.status === 'fulfilled' ? photoUrl.value : null;
-
-    // Atualiza histórico conversacional (mantém últimas 10 trocas = 20 mensagens)
-    historicoConversa.push({ role: 'user', content: q });
-    historicoConversa.push({ role: 'assistant', content: texto });
-    if (historicoConversa.length > 20) historicoConversa = historicoConversa.slice(-20);
-
-    // Armazena no cache e mantém fila de chaves para LRU simples (PERF #5)
-    respostasCache.set(q, { texto, foto });
-    respostasCacheKeys.push(q);
-    if (respostasCacheKeys.length > 20) {
-      respostasCache.delete(respostasCacheKeys.shift());
-    }
-
+    // Monta o card com área de streaming antes de ler os chunks
     const isFav = favoritos.some(f => f.pergunta === q);
-
-    // FIX #3: onclicks removidos do HTML — botões recebem eventos via addEventListener abaixo
     card.innerHTML = `
       <div class="answer-label">🐾 BicharIA${modoVet ? ' <span style="font-size:10px;background:rgba(63,182,139,.2);color:#3FB68B;padding:2px 8px;border-radius:999px;border:1px solid rgba(63,182,139,.4)">🩺 Vet</span>' : ''}</div>
-      ${foto ? `<div class="dog-photo-wrap"><img src="${foto}" alt="Foto" class="dog-photo" onerror="this.parentElement.style.display='none'"></div>` : ''}
-      <div class="answer-inner">${texto.replace(/\n/g, '<br>')}</div>
-      <div class="answer-actions">
+      <div id="stream-foto"></div>
+      <div class="answer-inner" id="stream-output"></div>
+      <div class="answer-actions" id="stream-actions" style="display:none">
         <button class="action-btn" id="btn-fav">${isFav ? '❤️ Favoritado' : '🤍 Favoritar'}</button>
         <button class="action-btn" id="btn-share">📤 Compartilhar</button>
         <button class="action-btn" id="btn-copiar">📋 Copiar</button>
       </div>`;
 
+    const outputEl = document.getElementById('stream-output');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let textoCompleto = '';
+    let buffer = '';
+
+    // Lê os chunks SSE e extrai os deltas de texto
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // última linha pode estar incompleta
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.error) throw new Error(parsed.error);
+          const delta = parsed.choices?.[0]?.delta?.content;
+          if (delta) {
+            textoCompleto += delta;
+            // Renderiza com quebras de linha — substitui \n por <br> de forma segura
+            outputEl.innerHTML = textoCompleto.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+          }
+        } catch { /* linha malformada — ignora */ }
+      }
+    }
+
+    if (!textoCompleto) textoCompleto = 'Não foi possível obter uma resposta.';
+
+    // Atualiza histórico conversacional (mantém últimas 10 trocas = 20 mensagens)
+    historicoConversa.push({ role: 'user', content: q });
+    historicoConversa.push({ role: 'assistant', content: textoCompleto });
+    if (historicoConversa.length > 20) historicoConversa = historicoConversa.slice(-20);
+
+    // Foto — aguarda a promise que corria em paralelo
+    const foto = await photoPromise.catch(() => null);
+    if (foto) {
+      document.getElementById('stream-foto').innerHTML =
+        `<div class="dog-photo-wrap"><img src="${foto}" alt="Foto" class="dog-photo" onerror="this.parentElement.style.display='none'"></div>`;
+    }
+
+    // Armazena no cache LRU
+    respostasCache.set(q, { texto: textoCompleto, foto: foto || null });
+    respostasCacheKeys.push(q);
+    if (respostasCacheKeys.length > 20) respostasCache.delete(respostasCacheKeys.shift());
+
+    // Mostra botões de ação
+    document.getElementById('stream-actions').style.display = '';
     const btnFav = document.getElementById('btn-fav');
     btnFav.addEventListener('click', () => toggleFavorito(q, btnFav));
-
     document.getElementById('btn-share').addEventListener('click', () => abrirShare(q));
     document.getElementById('btn-copiar').addEventListener('click', copiarResposta);
 
+    // Atualiza histórico conversacional visível
+    renderHistoricoConversa();
+
   } catch (err) {
-    card.innerHTML = `<div style="color:#E8825A;font-size:14px">⚠️ Erro: ${err.message}</div>`;
+    card.innerHTML = `<div style="color:#E8825A;font-size:14px">⚠️ Erro: ${escapeHtml(err.message)}</div>`;
   } finally {
-    _askEmAndamento = false; // PERF #3: libera o guard independente do resultado
-    input.value = ''; // FIX: limpa o input sempre, independente de erro
+    _askEmAndamento = false;
   }
 }
 
@@ -695,6 +804,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('btn-share-copiar')?.addEventListener('click', copiarShareText);
   document.getElementById('btn-fechar-share')?.addEventListener('click', fecharShare);
+  document.getElementById('btn-limpar-conversa')?.addEventListener('click', limparHistorico);
 
   // FIX: toolbar — migrado de onclick inline
   document.getElementById('btn-comparar-toolbar')?.addEventListener('click', abrirComparador);
