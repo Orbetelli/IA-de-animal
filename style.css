@@ -507,7 +507,69 @@ input:checked + .toggle-sl::before { transform:translateX(20px); }
 .btn-limpar-hist:active {
   transform: scale(.96);
 }
-/* ===== HISTÓRICO CONVERSACIONAL ===== */
+/* ===== TEMA CLARO ===== */
+body.tema-claro {
+  --bg: #F5F2ED;
+  --surface: #FFFDF9;
+  --card: #FFFFFF;
+  --text: #1A1A2E;
+  --muted: #6B7280;
+  --border: #E2DDD6;
+  --glow: rgba(245,166,35,.14);
+  --glow-strong: rgba(245,166,35,.28);
+}
+body.tema-claro::before { opacity: .15; }
+body.tema-claro::after {
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,.07) 0%, transparent 70%);
+}
+body.tema-claro .search-wrap input { background: var(--surface); }
+body.tema-claro .skeleton-line {
+  background: linear-gradient(90deg, #ede9e3 25%, rgba(0,0,0,.04) 50%, #ede9e3 75%);
+  background-size: 200% 100%;
+}
+body.tema-claro .tool-field input,
+body.tema-claro .tool-field select { background: var(--surface); }
+
+/* ===== ANIMAÇÃO ESCALONADA DOS ANIMAL CARDS ===== */
+.accordion-panel.open .animal-card {
+  animation: cardPop .28s var(--ease-spring) both;
+}
+.accordion-panel.open .animal-card:nth-child(1)  { animation-delay: .03s; }
+.accordion-panel.open .animal-card:nth-child(2)  { animation-delay: .06s; }
+.accordion-panel.open .animal-card:nth-child(3)  { animation-delay: .09s; }
+.accordion-panel.open .animal-card:nth-child(4)  { animation-delay: .12s; }
+.accordion-panel.open .animal-card:nth-child(5)  { animation-delay: .15s; }
+.accordion-panel.open .animal-card:nth-child(6)  { animation-delay: .18s; }
+.accordion-panel.open .animal-card:nth-child(7)  { animation-delay: .21s; }
+.accordion-panel.open .animal-card:nth-child(8)  { animation-delay: .24s; }
+.accordion-panel.open .animal-card:nth-child(9)  { animation-delay: .27s; }
+.accordion-panel.open .animal-card:nth-child(10) { animation-delay: .30s; }
+.accordion-panel.open .animal-card:nth-child(n+11) { animation-delay: .33s; }
+@keyframes cardPop {
+  from { opacity: 0; transform: scale(.88) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)  translateY(0); }
+}
+
+/* ===== GLOW PARA NOVOS GRUPOS ===== */
+#panel-peixes   .animal-card:hover { border-color:#7DBDE8; background:rgba(125,189,232,.06); box-shadow:0 6px 20px rgba(125,189,232,.1); }
+#panel-roedores .animal-card:hover { border-color:#D9B07D; background:rgba(217,176,125,.06); box-shadow:0 6px 20px rgba(217,176,125,.1); }
+
+/* ===== MODAL EMERGÊNCIA — semáforo de urgência ===== */
+.emerg-nivel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  animation: fadeUp .3s var(--ease-out) both;
+}
+.emerg-nivel.verde  { background: rgba(63,182,139,.12); border: 1px solid rgba(63,182,139,.3);  color: #3FB68B; }
+.emerg-nivel.amarelo{ background: rgba(245,166,35,.12);  border: 1px solid rgba(245,166,35,.3);  color: #F5A623; }
+.emerg-nivel.vermelho{ background: rgba(232,82,82,.12);  border: 1px solid rgba(232,82,82,.3);   color: #E85252; }
+
 #historico-conversa-lista {
   display: flex;
   flex-direction: column;

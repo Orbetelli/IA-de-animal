@@ -559,6 +559,74 @@ function abrirCalendario() {
   lista.innerHTML = _calendarioHTML;
 }
 
+// ===== TEMA CLARO/ESCURO =====
+function toggleTema() {
+  const claro = document.body.classList.toggle('tema-claro');
+  localStorage.setItem('bicharIA-tema', claro ? 'claro' : 'escuro');
+  document.getElementById('btn-tema-toolbar').textContent = claro ? '🌙 Tema' : '☀️ Tema';
+}
+
+// ===== MODO EMERGÊNCIA =====
+let _emergEmAndamento = false;
+
+function abrirEmergencia() {
+  document.getElementById('modal-emergencia').style.display = 'flex';
+  document.getElementById('emerg-resultado').style.display = 'none';
+  document.getElementById('emerg-resultado').innerHTML = '';
+  document.getElementById('emerg-sintoma').value = '';
+}
+
+async function avaliarEmergencia() {
+  if (_emergEmAndamento) return;
+  const especie = document.getElementById('emerg-especie').value;
+  const sintomaRaw = document.getElementById('emerg-sintoma').value.trim();
+  const sintoma = sintomaRaw.slice(0, 120).replace(/["""''`\\]/g, '');
+  const tempo = document.getElementById('emerg-tempo').value;
+  const res_div = document.getElementById('emerg-resultado');
+
+  if (!sintoma) {
+    res_div.textContent = 'Descreva o sintoma ou situação!';
+    res_div.classList.add('show');
+    return;
+  }
+
+  _emergEmAndamento = true;
+  res_div.innerHTML = '🚨 Avaliando urgência...';
+  res_div.classList.add('show');
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pergunta: `Avalie a urgência veterinária para: espécie: ${especie}, sintoma: "${sintoma}", tempo: ${tempo}. Responda APENAS em JSON: {"nivel":"VERDE ou AMARELO ou VERMELHO","titulo":"frase curta do nível","acoes":["ação 1","ação 2","ação 3"],"urgencia":"explicação em 2 frases","ir_vet":true ou false}`,
+        tema: 'saúde',
+        historico: []
+      })
+    });
+    const data = await res.json();
+    const raw = data.texto.replace(/```json|```/g, '').trim();
+    const emerg = JSON.parse(raw);
+
+    const corClass = { VERDE: 'verde', AMARELO: 'amarelo', VERMELHO: 'vermelho' }[emerg.nivel] || 'amarelo';
+    const emoji    = { VERDE: '🟢', AMARELO: '🟡', VERMELHO: '🔴' }[emerg.nivel] || '🟡';
+
+    res_div.innerHTML = `
+      <div class="emerg-nivel ${corClass}">${emoji} ${escapeHtml(emerg.nivel)} — ${escapeHtml(emerg.titulo)}</div>
+      <p style="font-size:13px;line-height:1.7;margin-bottom:10px">${escapeHtml(emerg.urgencia)}</p>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">O que fazer agora:</div>
+      <ul style="font-size:13px;line-height:1.8;padding-left:1.2rem;margin-bottom:10px">
+        ${emerg.acoes.map(a => `<li>${escapeHtml(a)}</li>`).join('')}
+      </ul>
+      ${emerg.ir_vet ? `<div style="background:rgba(232,82,82,.1);border:1px solid rgba(232,82,82,.25);border-radius:10px;padding:10px 12px;font-size:13px;color:#E85252;font-weight:500">🏥 Procure atendimento veterinário o quanto antes.</div>` : `<div style="background:rgba(63,182,139,.08);border:1px solid rgba(63,182,139,.2);border-radius:10px;padding:10px 12px;font-size:13px;color:#3FB68B">✅ Monitorar em casa por enquanto — consulte o vet se piorar.</div>`}
+    `;
+  } catch {
+    res_div.textContent = 'Erro ao avaliar. Tente novamente.';
+  } finally {
+    _emergEmAndamento = false;
+  }
+}
+
 // ===== COPIAR =====
 function copiarResposta() {
   const inner = document.querySelector('.answer-inner');
@@ -810,6 +878,19 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-comparar-toolbar')?.addEventListener('click', abrirComparador);
   document.getElementById('btn-calendario-toolbar')?.addEventListener('click', abrirCalendario);
   document.getElementById('btn-favoritos-toolbar')?.addEventListener('click', abrirFavoritos);
+  document.getElementById('btn-emergencia-toolbar')?.addEventListener('click', abrirEmergencia);
+  document.getElementById('btn-tema-toolbar')?.addEventListener('click', toggleTema);
+  document.getElementById('btn-fechar-emergencia')?.addEventListener('click', () => {
+    document.getElementById('modal-emergencia').style.display = 'none';
+  });
+  document.getElementById('btn-emerg-submit')?.addEventListener('click', avaliarEmergencia);
+
+  // Restaura tema salvo
+  if (localStorage.getItem('bicharIA-tema') === 'claro') {
+    document.body.classList.add('tema-claro');
+    const btnTema = document.getElementById('btn-tema-toolbar');
+    if (btnTema) btnTema.textContent = '🌙 Tema';
+  }
 
   // FIX: modo vet — migrado de onchange inline
   document.getElementById('toggle-vet')?.addEventListener('change', toggleModoVet);
